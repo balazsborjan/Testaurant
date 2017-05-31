@@ -1,0 +1,25 @@
+{
+  "images" : [
+    {
+      "idiom" : "iphone",
+      "filename" : "TableIt-logo-1.jpg",
+      "compression-type" : "gpu-optimized-best",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "iphone",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "iphone",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "version" : 1,
+    "author" : "xcode"
+  },
+  "properties" : {
+    "template-rendering-intent" : "original"
+  }
+}
