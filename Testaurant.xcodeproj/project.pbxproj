@@ -31,7 +31,6 @@
 		05C653D61EDECB6000EDD1E3 /* ReservationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C653D51EDECB6000EDD1E3 /* ReservationView.swift */; };
 		05C653D81EDEE2AE00EDD1E3 /* Reservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C653D71EDEE2AE00EDD1E3 /* Reservation.swift */; };
 		05C653DA1EDEE5F100EDD1E3 /* Rating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C653D91EDEE5F100EDD1E3 /* Rating.swift */; };
-		05C653DC1EDF06C300EDD1E3 /* ReservationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C653DB1EDF06C300EDD1E3 /* ReservationTableViewCell.swift */; };
 		05C653E01EE1E5E800EDD1E3 /* NetworkDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C653DF1EE1E5E800EDD1E3 /* NetworkDelegate.swift */; };
 /* End PBXBuildFile section */
 
@@ -62,7 +61,6 @@
 		05C653D51EDECB6000EDD1E3 /* ReservationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReservationView.swift; sourceTree = "<group>"; };
 		05C653D71EDEE2AE00EDD1E3 /* Reservation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reservation.swift; sourceTree = "<group>"; };
 		05C653D91EDEE5F100EDD1E3 /* Rating.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rating.swift; sourceTree = "<group>"; };
-		05C653DB1EDF06C300EDD1E3 /* ReservationTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReservationTableViewCell.swift; sourceTree = "<group>"; };
 		05C653DF1EE1E5E800EDD1E3 /* NetworkDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -175,7 +173,6 @@
 				05ABE7051EDB31F2003A9CCB /* MainPageTableViewCell.swift */,
 				05C653D11EDECA6000EDD1E3 /* GaleryCollectionViewCell.swift */,
 				05C653D31EDECA7700EDD1E3 /* RatingTableViewCell.swift */,
-				05C653DB1EDF06C300EDD1E3 /* ReservationTableViewCell.swift */,
 			);
 			name = Cells;
 			sourceTree = "<group>";
@@ -260,7 +257,6 @@
 				05C653E01EE1E5E800EDD1E3 /* NetworkDelegate.swift in Sources */,
 				05A52BEE1EBB19A900DAF16A /* MainPageViewController.swift in Sources */,
 				05A52BBF1EBB0BF000DAF16A /* LoginViewController.swift in Sources */,
-				05C653DC1EDF06C300EDD1E3 /* ReservationTableViewCell.swift in Sources */,
 				057C044F1ED484A100E6253A /* GlobalMembers.swift in Sources */,
 				052D36391ED84E9F0086B1D5 /* MoreOptionView.swift in Sources */,
 				057C044C1ED481FA00E6253A /* Restaurant.swift in Sources */,

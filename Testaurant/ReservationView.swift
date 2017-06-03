@@ -10,9 +10,5 @@ import UIKit
 
 class ReservationView: UIView {
 
-    @IBOutlet weak var numberOfPeopleLabel: UILabel!
     
-    @IBOutlet weak var pickerView: UIPickerView!
-    
-    @IBOutlet weak var actionButton: UIButton!
 }
