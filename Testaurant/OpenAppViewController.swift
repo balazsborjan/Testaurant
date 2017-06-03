@@ -16,20 +16,17 @@ class OpenAppViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.navigationController?.navigationBar.isTranslucent = false
+        globalContainer.networkDelegate = self
         
-        fetchRestaurants()
+        self.navigationController?.navigationBar.isTranslucent = false
         
         if (FBSDKAccessToken.current() == nil) {
             
-            if let viewController = storyboard?.instantiateViewController(withIdentifier: "loginVC") {
-                
-                self.navigationController?.pushViewController(viewController, animated: true)
-            }
+            navigateToLoginViewController()
             
         } else {
             
-            globalContainerRestaurantsLoadedEventHandler = globalContainer.restaurantsLoadedEvent.addHandler(target: self, handler: navigateToMain)
+            fetchRestaurants()
         }
     }
     
@@ -58,7 +55,37 @@ class OpenAppViewController: UIViewController {
         }
     }
     
-    private func navigateToMain() {
+    fileprivate func showNetworkAlert() {
+        
+        let alert = UIAlertController(
+            title: "Kapcsolódási hiba",
+            message: "Kérjük ellenőrizze internetkapcsolatát",
+            preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "Rendben", style: .default, handler: { (action) in
+            
+            self.fetchRestaurants()
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Mégsem", style: .cancel, handler: { (action) in
+            
+            self.navigateToLoginViewController()
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    fileprivate func navigateToLoginViewController() {
+        
+        if let viewController = storyboard?.instantiateViewController(withIdentifier: "loginVC") {
+            
+            fetchRestaurants()
+            
+            self.navigationController?.pushViewController(viewController, animated: true)
+        }
+    }
+    
+    fileprivate func navigateToMain() {
         
         if let viewController = storyboard?.instantiateViewController(withIdentifier: "mainViewController") {
             
@@ -82,3 +109,29 @@ class OpenAppViewController: UIViewController {
         }
     }
 }
+
+extension OpenAppViewController : NetworkDelegate {
+    
+    func restaurantRequestFinished(successed: Bool) {
+        
+        if successed {
+            
+            self.navigateToMain()
+            
+        } else {
+            
+            self.showNetworkAlert()
+        }
+    }
+    
+    func restaurantImageRequestFinished(seccessed: Bool) {
+        
+        
+    }
+}
+
+
+
+
+
+

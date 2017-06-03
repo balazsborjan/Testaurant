@@ -25,6 +25,8 @@ class Restaurant: Any {
     
     var image: UIImage?
     
+    var ratingCount: Int?  // Kell egy tábla majd, amiben az értékelések lesznek, ennek lesz egy foreignkey oszlopa a restaurantID-vel, ebből kell majd Count()-al kivenni ezt, mégpedig akkor, amikor kiválasztjuk a listából az adott éttermet.
+    
     init(id: Int, address: String, name: String, maxPeaopleAtTable: Int, openingTime: String, mainImageURL: String) {
         
         self.ID = id
@@ -57,7 +59,7 @@ class Restaurant: Any {
         self.MainImageURL = mainImageURL
     }
     
-    static func getRestaurants(matching query: String?, completion: @escaping ([Restaurant]) -> Void) {
+    static func getRestaurants(matching query: String?, completion: @escaping ([Restaurant]?) -> Void) {
         
         if let urlPath = GlobalMembers.restaurantCRUD_URLs[RestaurantCRUD.Select] {
             
@@ -73,7 +75,14 @@ class Restaurant: Any {
                         
                         print("etterem error")
                         
+                        DispatchQueue.main.async {
+                            
+                            completion(nil)
+                        }
+                        
                     } else {
+                        
+                        print("fetching restaurants")
                         
                         let json = try? JSONSerialization.jsonObject(with: data!, options:.allowFragments) as! [AnyObject]
                         
@@ -102,25 +111,29 @@ class Restaurant: Any {
         }
     }
     
-    static func getImages(completion: () -> Void) {
+    static func getImages(completion: (Bool) -> Void) {
         
         for restaurant in globalContainer.restaurants {
             
             if let data = (globalContainer.cdMainImages.filter({ Int($0.restaurantID) == restaurant.ID }).first?.image) as Data? {
                 
-                restaurant.setImage(withData: data, fromDB: false)
+                _ = restaurant.setImage(withData: data, fromDB: false)
                 
             } else {
                 
                 // MARK: NEM ASYNC!!!
-                restaurant.getImageFromDBSync(completion: restaurant.setImage(withData:fromDB:))
+                if restaurant.getImageFromDBSync(completion: restaurant.setImage(withData:fromDB:)) {
+                    
+                    completion((false))
+                    break
+                }
             }
         }
         
-        completion(())
+        completion((true))
     }
     
-    private func getImageFromDBAsync(completion: @escaping (Data, Bool) -> Void) {
+    private func getImageFromDBAsync(completion: @escaping (Data?, Bool) -> Void) {
         
         if let url = URL(string: self.MainImageURL!) {
             
@@ -131,8 +144,11 @@ class Restaurant: Any {
                 if error != nil {
                     
                     print("image error")
+                    completion(nil, false)
                     
                 } else {
+                    
+                    print("fetching restaurants")
                     
                     if data != nil {
                         
@@ -144,6 +160,7 @@ class Restaurant: Any {
                     } else {
                         
                         print("data nil")
+                        completion(nil, false)
                     }
                 }
                 
@@ -151,31 +168,46 @@ class Restaurant: Any {
         }
     }
     
-    private func getImageFromDBSync(completion: @escaping (Data, Bool) -> Void) {
+    private func getImageFromDBSync(completion: @escaping (Data?, Bool) -> Bool) -> Bool {
         
         if let url = URL(string: self.MainImageURL!) {
             
             if let data = try? Data(contentsOf: url) {
                 
-                completion(data, true)
+                _ = completion(data, true)
+                
+            } else {
+                
+                return false
             }
         }
+        
+        return true
     }
     
-    private func setImage(withData data: Data, fromDB: Bool) -> Void {
+    private func setImage(withData data: Data?, fromDB: Bool) -> Bool {
         
-        self.image = UIImage(data: data)
-        
-        print("\(self.ID!) - image ok - fromDB: \(fromDB)")
-        
-        if fromDB {
+        if data != nil {
             
-            let newMainImage = MainImage(context: managedObjectContext!)
+            self.image = UIImage(data: data!)
             
-            newMainImage.restaurantID = Int32(self.ID!)
-            newMainImage.image = data as NSData
+            print("\(self.ID!) - image ok - fromDB: \(fromDB)")
             
-            globalContainer.cdMainImages.append(newMainImage)
+            if fromDB {
+                
+                let newMainImage = MainImage(context: managedObjectContext!)
+                
+                newMainImage.restaurantID = Int32(self.ID!)
+                newMainImage.image = data! as NSData
+                
+                globalContainer.cdMainImages.append(newMainImage)
+            }
+            
+            return true
+            
+        } else {
+            
+            return false
         }
     }
 }

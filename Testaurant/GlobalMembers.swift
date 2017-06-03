@@ -25,6 +25,8 @@ class GlobalContainer {
     
     let restaurantsLoadedEvent = Event<Void>()
     
+    var networkDelegate: NetworkDelegate?
+    
     init() {
         
         fetchMainImages()
@@ -49,20 +51,31 @@ class GlobalContainer {
         
         Restaurant.getRestaurants(matching: nil) { (newRestaurants) in
             
-            self.restaurants = newRestaurants
-
-            Restaurant.getImages(completion: self.allRestaurantsLoaded)
+            if newRestaurants != nil {
+                
+                self.restaurants = newRestaurants!
+                
+                self.networkDelegate?.restaurantRequestFinished(successed: true)
+                
+                Restaurant.getImages(completion: self.allRestaurantsLoaded)
+            
+            } else {
+                
+                self.networkDelegate?.restaurantRequestFinished(successed: false)
+            }
         }
     }
     
-    private func allRestaurantsLoaded() {
+    private func allRestaurantsLoaded(successed: Bool) {
         
         if managedObjectContext != nil && managedObjectContext!.hasChanges {
             
             try? managedObjectContext!.save()
         }
         
-        self.restaurantsLoadedEvent.raise(data: ())
+        self.networkDelegate?.restaurantImageRequestFinished(seccessed: true)
+        
+        //self.restaurantsLoadedEvent.raise(data: ())
     }
 }
 
@@ -168,6 +181,53 @@ extension UIColor {
     convenience init(netHex:Int) {
         
         self.init(red:(netHex >> 16) & 0xff, green:(netHex >> 8) & 0xff, blue:netHex & 0xff)
+    }
+}
+
+extension Date {
+    
+    static func date(from: String) -> Date {
+        
+        let dateFormatter = DateFormatter()
+        
+        return dateFormatter.date(from: from)!
+    }
+    
+    func year() -> String {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy"
+        dateFormatter.timeZone = NSTimeZone(name: "GMT") as TimeZone!
+        
+        return dateFormatter.string(from: self)
+    }
+    
+    func toFullFormatString(withYear: Bool, withLongFormatMonth: Bool) -> String {
+        
+        let dateFormatter = DateFormatter()
+        
+        if withYear || self.year() != Date().year() {
+            
+            dateFormatter.dateFormat = withLongFormatMonth ? "yyyy. MMM. dd. HH:mm" : "yyyy. MM. dd. HH:mm"
+            
+        } else {
+            
+            dateFormatter.dateFormat = withLongFormatMonth ? "MMM. dd. HH:mm" :  "MM. dd. HH:mm"
+        }
+        
+        
+        dateFormatter.timeZone = NSTimeZone(name: "GMT") as TimeZone!
+        
+        return dateFormatter.string(from: self)
+    }
+    
+    func toString() -> String {
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy. MM. dd."
+        dateFormatter.timeZone = NSTimeZone(name: "GMT") as TimeZone!
+        
+        return dateFormatter.string(from: self)
     }
 }
 

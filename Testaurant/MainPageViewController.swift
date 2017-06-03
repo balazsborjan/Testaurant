@@ -349,6 +349,7 @@ class MainPageViewController: UITableViewController {
                             
                             restaurantViewController.navigationItem.title = selectedRestaurant.Name
                             restaurantViewController.restaurant = selectedRestaurant
+                            restaurantViewController.image = cell.mainPictureImageView.image
                         }
                     }
                 }
