@@ -9,6 +9,8 @@
 import Foundation
 import UIKit
 import CoreData
+import CoreLocation
+import FBSDKLoginKit
 
 let storyboard = UIStoryboard.init(name: "Main", bundle: nil)
 let statusBar = UIApplication.shared.statusBarFrame
@@ -19,18 +21,57 @@ let globalContainer = GlobalContainer()
 
 class GlobalContainer {
     
+    let user = User()
+    
     var cdMainImages: [MainImage] = []
     var restaurants: [Restaurant] = []
     var filteredRestaurants: [Restaurant] = []
+    
+    var ratings = Dictionary<Int, Array<Rating>>()
     
     let restaurantsLoadedEvent = Event<Void>()
     
     var networkDelegate: NetworkDelegate?
     
+    var ratingNetworkDelegate: RatingNetworkProtocol?
+    
+    let locationManager = CLLocationManager()
+    
     init() {
         
         fetchMainImages()
-        //fetchRestaurants()
+        setFBUserInfo()
+    }
+    
+    func setFBUserInfo() {
+        
+        let graphRequest = FBSDKGraphRequest(graphPath: "me", parameters: ["fields" : "id, name, first_name, last_name, email"])
+        let connection = FBSDKGraphRequestConnection()
+        
+        connection.setDelegateQueue(OperationQueue.main)
+        
+        connection.add(graphRequest, completionHandler: { (connection, result, error) -> Void in
+            
+            if error != nil {
+                
+                //ERRORHANDLING!!
+                print("infolekérés közben hiba")
+                
+            } else {
+                
+                let data = result as! [String : AnyObject]
+                
+                self.user.userID = data["id"] as? String
+                self.user.name = data["name"] as? String
+                self.user.email = data["email"] as? String
+                self.user.firstName = data["first_name"] as? String
+                self.user.lastName = data["last_name"] as? String
+                
+                let url = NSURL(string: "https://graph.facebook.com/\(self.user.userID!)/picture?type=large&return_ssl_resources=1")
+                self.user.profileImage = UIImage(data: NSData(contentsOf: url! as URL)! as Data)
+            }
+        })
+        connection.start()
     }
     
     private func fetchMainImages() {
@@ -77,6 +118,29 @@ class GlobalContainer {
         
         //self.restaurantsLoadedEvent.raise(data: ())
     }
+    
+    func fetchRatingsByRestaurantID(for restaurantID: Int) -> Void {
+        
+        Rating.getRatingsByRestaurantID(matching: String(describing: restaurantID)) { (newRatings) in
+            
+            if newRatings != nil {
+                
+                self.ratings[restaurantID] = newRatings
+                self.ratingNetworkDelegate?.ratingRequestFinished(successed: true)
+                
+            } else {
+                
+                self.ratingNetworkDelegate?.ratingRequestFinished(successed: false)
+            }
+        }
+    }
+    
+    func isLocationAuthorizationEnabled() -> Bool {
+        
+        let status = CLLocationManager.authorizationStatus()
+        
+        return status == .notDetermined || status == .authorizedWhenInUse || status == .authorizedAlways
+    }
 }
 
 struct GlobalMembers {
@@ -85,13 +149,31 @@ struct GlobalMembers {
     
     static let restaurantCRUD_URLs: Dictionary<RestaurantCRUD, String> = [
         
-        .Select : "GetAllEtterem"
+        .Select : "GetAllEtterem",
+        .GetImageCountForRestaurant : "GetImageCountForRestaurantID/%d",
+        .GetImageByRestaurantIDAndRowNUM : "GetImageByRestaurantIDAndRowNUM/%d/%d"
+    ]
+    
+    static let ratingCRUD_URLs: Dictionary<RatingCRUD, String> = [
+        
+        .SelectByRestaurantID : "GetRatingByRestaurantID/"
     ]
 }
 
 enum RestaurantCRUD {
     
     case Select
+    case Create
+    case Update
+    case Delete
+    case GetImageCountForRestaurant
+    case GetImageByRestaurantIDAndRowNUM
+}
+
+enum RatingCRUD {
+    
+    case Select
+    case SelectByRestaurantID
     case Create
     case Update
     case Delete
@@ -197,7 +279,6 @@ extension Date {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy"
-        dateFormatter.timeZone = NSTimeZone(name: "GMT") as TimeZone!
         
         return dateFormatter.string(from: self)
     }
@@ -215,9 +296,6 @@ extension Date {
             dateFormatter.dateFormat = withLongFormatMonth ? "MMM. dd. HH:mm" :  "MM. dd. HH:mm"
         }
         
-        
-        dateFormatter.timeZone = NSTimeZone(name: "GMT") as TimeZone!
-        
         return dateFormatter.string(from: self)
     }
     
@@ -225,7 +303,6 @@ extension Date {
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy. MM. dd."
-        dateFormatter.timeZone = NSTimeZone(name: "GMT") as TimeZone!
         
         return dateFormatter.string(from: self)
     }

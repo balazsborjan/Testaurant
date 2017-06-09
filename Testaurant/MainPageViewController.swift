@@ -335,6 +335,8 @@ class MainPageViewController: UITableViewController {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
+        closeMoreOptionView()
+        
         if let cell = sender as? MainPageTableViewCell {
             
             if let identifier = segue.identifier {
@@ -347,10 +349,21 @@ class MainPageViewController: UITableViewController {
                         
                         if let restaurantViewController = segue.destination as? RestaurantViewController {
                             
-                            restaurantViewController.navigationItem.title = selectedRestaurant.Name
                             restaurantViewController.restaurant = selectedRestaurant
-                            restaurantViewController.image = cell.mainPictureImageView.image
                         }
+                    }
+                }
+            }
+            
+        } else {
+            
+            if let identifier = segue.identifier {
+                
+                if identifier == "showAllRestaurantOnMap" {
+                    
+                    if let mapViewController = segue.destination as? MapViewController {
+                        
+                        mapViewController.restaurants = filteredRestaurants.filter { $0.ID! < 9 }
                     }
                 }
             }
@@ -434,12 +447,4 @@ extension MainPageViewController : UISearchBarDelegate {
 //                        print("Friends ID : \(fb_friend_Name)")
 //    }
 
-    /*
-    // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */

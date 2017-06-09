@@ -8,8 +8,19 @@
 
 import Foundation
 import UIKit
+import MapKit
 
-class Restaurant: Any {
+class Restaurant: NSObject, MKAnnotation {
+    
+    // MARK: MapKit
+    
+    var coordinate = CLLocationCoordinate2D()
+    
+    var title: String? { return Name }
+    
+    var subtitle: String? { return Address }
+    
+    // MARK: Default implementaiton
     
     var ID: Int?
     
@@ -25,9 +36,18 @@ class Restaurant: Any {
     
     var image: UIImage?
     
+    var images = Array<UIImage>() {
+        didSet{
+            self.galeryImageDelegate?.newImageAdded()
+        }
+    }
+    
+    var galeryImageDelegate : GaleryImageProtocol?
+    
     var ratingCount: Int?  // Kell egy tábla majd, amiben az értékelések lesznek, ennek lesz egy foreignkey oszlopa a restaurantID-vel, ebből kell majd Count()-al kivenni ezt, mégpedig akkor, amikor kiválasztjuk a listából az adott éttermet.
     
     init(id: Int, address: String, name: String, maxPeaopleAtTable: Int, openingTime: String, mainImageURL: String) {
+        super.init()
         
         self.ID = id
         self.Address = address
@@ -38,6 +58,7 @@ class Restaurant: Any {
     }
     
     init?(json: [String: AnyObject]) {
+        super.init()
      
         guard let id = json["ID"] as? Int,
             let name = json["Name"] as? String,
@@ -57,6 +78,24 @@ class Restaurant: Any {
         self.MaxPeopleAtTable = maxPeopleAtTable
         self.OpeningTime = nil
         self.MainImageURL = mainImageURL
+        
+        getGeoCoord()
+    }
+    
+    private func getGeoCoord() {
+        
+        let geocoder = CLGeocoder()
+        
+        geocoder.geocodeAddressString(self.Address!, completionHandler: { (placemarks, error) in
+            
+            if let placemark = placemarks?.first {
+                
+                if let location = placemark.location {
+                    
+                    self.coordinate = location.coordinate
+                }
+            }
+        })
     }
     
     static func getRestaurants(matching query: String?, completion: @escaping ([Restaurant]?) -> Void) {
@@ -208,6 +247,75 @@ class Restaurant: Any {
         } else {
             
             return false
+        }
+    }
+    
+    func getImages() {
+        
+        if let urlPath = GlobalMembers.restaurantCRUD_URLs[RestaurantCRUD.GetImageCountForRestaurant] {
+            
+            let urlParameters = String(format: urlPath, self.ID!)
+            
+            if let url = URL(string: GlobalMembers.mainURL + urlParameters) {
+                
+                do {
+                    
+                    _ = try Data(contentsOf: url)
+                    
+                    // MARK: Át kellene konvertálni (vagy JSON-be lekérni) ezt a count-ot!!!
+                    
+                    doGetImages(count: 5)
+                    
+                } catch {
+                    
+                    print("count lekérésnél hiba")
+                }
+            }
+        }
+    }
+    
+    private func doGetImages(count: Int) {
+        
+        if let urlPath = GlobalMembers.restaurantCRUD_URLs[RestaurantCRUD.GetImageByRestaurantIDAndRowNUM] {
+            
+            var newImages = Array<UIImage>()
+            
+            for i in 1...count {
+                
+                let urlParameters = String(format: urlPath, self.ID!, i)
+                
+                if let url = URL(string: GlobalMembers.mainURL + urlParameters) {
+                    
+                    let session = URLSession.shared
+                    
+                    session.dataTask(with: url, completionHandler: { (data, response, error) in
+                        
+                        if error != nil {
+                            
+                            print("képlekérés error")
+                            
+                        } else {
+                            
+                            if data != nil {
+                                
+                                if let newImage = UIImage(data: data!) {
+                                    
+                                    DispatchQueue.main.async {
+                                        
+                                        newImages.append(newImage)
+                                        
+                                        self.images = newImages
+                                    }
+                                }
+                                
+                            } else {
+                                
+                                print("képlekérés data nil")
+                            }
+                        }
+                    }).resume()
+                }
+            }
         }
     }
 }

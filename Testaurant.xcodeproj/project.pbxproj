@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		052D36371ED73E420086B1D5 /* MoreInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052D36361ED73E420086B1D5 /* MoreInfoView.swift */; };
 		052D36391ED84E9F0086B1D5 /* MoreOptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052D36381ED84E9F0086B1D5 /* MoreOptionView.swift */; };
+		0548CCD51EE933BB00FE76B0 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0548CCD41EE933BB00FE76B0 /* MapKit.framework */; };
+		0548CCD71EE936D700FE76B0 /* SelectedRestaurantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0548CCD61EE936D700FE76B0 /* SelectedRestaurantView.swift */; };
+		0548CCD91EE9A66E00FE76B0 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0548CCD81EE9A66E00FE76B0 /* MapViewController.swift */; };
+		0548CCDB1EEAD40800FE76B0 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0548CCDA1EEAD40800FE76B0 /* User.swift */; };
 		057C044C1ED481FA00E6253A /* Restaurant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057C044B1ED481FA00E6253A /* Restaurant.swift */; };
 		057C044F1ED484A100E6253A /* GlobalMembers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057C044E1ED484A100E6253A /* GlobalMembers.swift */; };
 		05A52BBD1EBB0BF000DAF16A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A52BBC1EBB0BF000DAF16A /* AppDelegate.swift */; };
@@ -37,6 +41,10 @@
 /* Begin PBXFileReference section */
 		052D36361ED73E420086B1D5 /* MoreInfoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoreInfoView.swift; sourceTree = "<group>"; };
 		052D36381ED84E9F0086B1D5 /* MoreOptionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoreOptionView.swift; sourceTree = "<group>"; };
+		0548CCD41EE933BB00FE76B0 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		0548CCD61EE936D700FE76B0 /* SelectedRestaurantView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SelectedRestaurantView.swift; sourceTree = "<group>"; };
+		0548CCD81EE9A66E00FE76B0 /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
+		0548CCDA1EEAD40800FE76B0 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		057C044B1ED481FA00E6253A /* Restaurant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Restaurant.swift; sourceTree = "<group>"; };
 		057C044E1ED484A100E6253A /* GlobalMembers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalMembers.swift; sourceTree = "<group>"; };
 		05A52BB91EBB0BF000DAF16A /* Testaurant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Testaurant.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -71,6 +79,7 @@
 			files = (
 				05A52BE91EBB122C00DAF16A /* Bolts.framework in Frameworks */,
 				05A52BEA1EBB122C00DAF16A /* FBSDKShareKit.framework in Frameworks */,
+				0548CCD51EE933BB00FE76B0 /* MapKit.framework in Frameworks */,
 				05A52BEB1EBB122C00DAF16A /* FBSDKCoreKit.framework in Frameworks */,
 				05A52BEC1EBB122C00DAF16A /* FBSDKLoginKit.framework in Frameworks */,
 			);
@@ -85,6 +94,7 @@
 				057C044B1ED481FA00E6253A /* Restaurant.swift */,
 				05C653D71EDEE2AE00EDD1E3 /* Reservation.swift */,
 				05C653D91EDEE5F100EDD1E3 /* Rating.swift */,
+				0548CCDA1EEAD40800FE76B0 /* User.swift */,
 			);
 			name = POJO;
 			sourceTree = "<group>";
@@ -111,6 +121,7 @@
 			isa = PBXGroup;
 			children = (
 				057C044E1ED484A100E6253A /* GlobalMembers.swift */,
+				05C653DF1EE1E5E800EDD1E3 /* NetworkDelegate.swift */,
 				05A52BC01EBB0BF000DAF16A /* Main.storyboard */,
 				05B489761ED9741C00F500AB /* Launch Screen.storyboard */,
 				05A52BF21EBB353500DAF16A /* Views */,
@@ -118,7 +129,6 @@
 				05ABE7071EDB31F5003A9CCB /* Cells */,
 				057C044D1ED482E600E6253A /* POJO */,
 				05A52BD11EBB0C2500DAF16A /* Supporting files */,
-				05C653DF1EE1E5E800EDD1E3 /* NetworkDelegate.swift */,
 			);
 			path = Testaurant;
 			sourceTree = "<group>";
@@ -138,6 +148,7 @@
 		05A52BDC1EBB0E2500DAF16A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0548CCD41EE933BB00FE76B0 /* MapKit.framework */,
 				05A52BE51EBB122C00DAF16A /* Bolts.framework */,
 				05A52BE61EBB122C00DAF16A /* FBSDKShareKit.framework */,
 				05A52BE71EBB122C00DAF16A /* FBSDKCoreKit.framework */,
@@ -153,6 +164,7 @@
 				05A52BBE1EBB0BF000DAF16A /* LoginViewController.swift */,
 				05A52BED1EBB19A900DAF16A /* MainPageViewController.swift */,
 				05C653CF1EDEB16A00EDD1E3 /* RestaurantViewController.swift */,
+				0548CCD81EE9A66E00FE76B0 /* MapViewController.swift */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -163,6 +175,7 @@
 				052D36361ED73E420086B1D5 /* MoreInfoView.swift */,
 				052D36381ED84E9F0086B1D5 /* MoreOptionView.swift */,
 				05C653D51EDECB6000EDD1E3 /* ReservationView.swift */,
+				0548CCD61EE936D700FE76B0 /* SelectedRestaurantView.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -211,6 +224,11 @@
 						CreatedOnToolsVersion = 8.3.2;
 						DevelopmentTeam = 7LF9VDB7F5;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Maps.iOS = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -255,8 +273,11 @@
 				052D36371ED73E420086B1D5 /* MoreInfoView.swift in Sources */,
 				05C653D81EDEE2AE00EDD1E3 /* Reservation.swift in Sources */,
 				05C653E01EE1E5E800EDD1E3 /* NetworkDelegate.swift in Sources */,
+				0548CCD71EE936D700FE76B0 /* SelectedRestaurantView.swift in Sources */,
 				05A52BEE1EBB19A900DAF16A /* MainPageViewController.swift in Sources */,
 				05A52BBF1EBB0BF000DAF16A /* LoginViewController.swift in Sources */,
+				0548CCD91EE9A66E00FE76B0 /* MapViewController.swift in Sources */,
+				0548CCDB1EEAD40800FE76B0 /* User.swift in Sources */,
 				057C044F1ED484A100E6253A /* GlobalMembers.swift in Sources */,
 				052D36391ED84E9F0086B1D5 /* MoreOptionView.swift in Sources */,
 				057C044C1ED481FA00E6253A /* Restaurant.swift in Sources */,

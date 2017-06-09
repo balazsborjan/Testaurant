@@ -19,11 +19,23 @@ class RestaurantViewController: UIViewController {
     
     var peopleCount: [Int] = []
     
-    var ratings: [Rating] = []
+    var ratings: [Rating] = [] {
+        didSet{
+            self.ratingTableView.reloadData()
+        }
+    }
     
     @IBOutlet weak var imageView: UIImageView!
     
     var image: UIImage?
+    
+    @IBOutlet weak var scrollView: UIScrollView!
+    
+    @IBOutlet weak var openingTimeLabel: UIButton!
+    
+    @IBOutlet weak var addressLabel: UIButton!
+    
+    @IBOutlet var contentView: SelectedRestaurantContentView!
     
     @IBOutlet var galeryCollectionView: UICollectionView!
     
@@ -48,14 +60,22 @@ class RestaurantViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.navigationItem.title = restaurant.Name
+        
+        imageView.image = restaurant.image
+        
         setupPeopleCount()
         
-        imageView.image = image
+        addressLabel.setTitle("Cím: \(String(describing: restaurant.Address!))", for: .normal)
+        
+        globalContainer.ratingNetworkDelegate = self
+        restaurant.galeryImageDelegate = self
         
         picker.delegate = self
         picker.dataSource = self
         
         datePicker.minimumDate = Date()
+        datePicker.datePickerMode = .dateAndTime
         
         peopleTextField.inputView = picker
         dateTextField.inputView = datePicker
@@ -67,8 +87,34 @@ class RestaurantViewController: UIViewController {
         sendRservation.addTarget(self, action: #selector(sendReservation(_:)), for: .touchUpInside)
         tapGestureRecognizer.addTarget(self, action: #selector(viewTapped(_:)))
         
-        reservationView.addGestureRecognizer(tapGestureRecognizer)
         self.view.addGestureRecognizer(tapGestureRecognizer)
+        
+        scrollView.contentSize.height = contentView.bounds.height
+        scrollView.contentSize.width = self.view.bounds.width
+        scrollView.contentMode = .scaleToFill
+        
+        scrollView.addSubview(contentView)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        fetchRatings()
+        restaurant?.getImages()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillHide, object: nil)
     }
     
     private func setupPeopleCount() {
@@ -82,6 +128,10 @@ class RestaurantViewController: UIViewController {
         }
     }
 
+    private func fetchRatings() {
+        
+        globalContainer.fetchRatingsByRestaurantID(for: self.restaurant.ID!)
+    }
     
     func viewTapped(_ sender: UITapGestureRecognizer) {
         
@@ -94,14 +144,16 @@ class RestaurantViewController: UIViewController {
         
         switch sender.selectedSegmentIndex {
         case 0:
-            self.view.bringSubview(toFront: reservationView)
+            contentView.bringSubview(toFront: reservationView)
         case 1:
-            self.view.bringSubview(toFront: galeryCollectionView)
+            contentView.bringSubview(toFront: galeryCollectionView)
         case 2:
-            self.view.bringSubview(toFront: ratingTableView)
+            contentView.bringSubview(toFront: ratingTableView)
         default:
             break
         }
+        
+        scrollView.contentOffset.y = 0
     }
     
     @objc private func reservationDateChanged(_ sender: UIDatePicker) {
@@ -120,7 +172,7 @@ class RestaurantViewController: UIViewController {
         
         let alert = UIAlertController(
             title: "Foglalás küldése",
-            message: "Foglalás részletei:\nAsztal \(reservation.selectedPeopleCount) főre\nidőpont: \(reservation.date?.toString() ?? "")\nhelyszín: \(restaurant.Name ?? "")",
+            message: "Foglalás részletei:\nAsztal \(reservation.selectedPeopleCount!) főre\nidőpont: \(reservation.date?.toFullFormatString(withYear: false, withLongFormatMonth: true) ?? "")\nhelyszín: \(restaurant.Name ?? "")",
             preferredStyle: .alert)
         
         alert.addAction(UIAlertAction(title: "Küldés", style: .default, handler: { (action) in
@@ -146,6 +198,17 @@ class RestaurantViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         resignTextFieldFirstResponder()
+        
+        if let identifier = segue.identifier {
+            
+            if identifier == "showRestaurantOnMap" {
+                
+                if let destination = segue.destination as? MapViewController {
+                    
+                    destination.restaurants = [self.restaurant]
+                }
+            }
+        }
     }
 }
 
@@ -166,7 +229,7 @@ extension RestaurantViewController : UITableViewDelegate, UITableViewDataSource 
         let cell = RatingTableViewCell(style: .value1, reuseIdentifier: nil)
         
         cell.textLabel?.text = ratings[indexPath.row].userName
-        cell.detailTextLabel?.text = String(describing: ratings[indexPath.row].rating)
+        cell.detailTextLabel?.text = String(describing: ratings[indexPath.row].Value)
         
         return cell
     }
@@ -225,16 +288,73 @@ extension RestaurantViewController : UIPickerViewDataSource, UIPickerViewDelegat
     }
 }
 
-//extension RestaurantViewController : UICollectionViewDelegate, UICollectionViewDataSource {
-//    
-//    
-//}
+extension RestaurantViewController : UICollectionViewDelegate, UICollectionViewDataSource {
 
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        
+        return 1
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+     
+        return restaurant.images.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "galeryCell", for: indexPath) as? GaleryCollectionViewCell {
+            
+            let width = collectionView.frame.width / 4
+            
+            cell.setFrame(x: indexPath.row, width: width)
+            
+            cell.imageView.image = restaurant.images[indexPath.row]
+            
+            return cell
+        }
+        
+        return UICollectionViewCell()
+    }
+}
 
+extension RestaurantViewController : RatingNetworkProtocol {
+    
+    func ratingRequestFinished(successed: Bool) {
+        
+        if successed {
+            
+            self.ratings = globalContainer.ratings[self.restaurant.ID!]!
+        }
+    }
+}
 
+extension RestaurantViewController : GaleryImageProtocol {
+    
+    func newImageAdded() {
+        
+        self.galeryCollectionView.reloadData()
+    }
+}
 
-
-
-
-
-
+extension RestaurantViewController {
+    
+    func keyboardWillShow(notification: NSNotification) {
+        
+        if let keyboardSize = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
+            
+            let keyboardRectTopY = self.view.frame.height - keyboardSize.height
+            
+            let textFieldBottomY = dateTextField.frame.maxY + reservationView.frame.minY + (navigationController?.navigationBar.frame.height)!
+            
+            if textFieldBottomY > keyboardRectTopY {
+                
+                self.view.frame.origin.y = 0 - (textFieldBottomY - keyboardRectTopY)
+            }
+        }
+    }
+    
+    func keyboardWillHide(notification: NSNotification) {
+        
+        self.view.frame.origin.y = (navigationController?.navigationBar.frame.maxY)!
+    }
+}

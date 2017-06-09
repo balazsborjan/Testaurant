@@ -11,14 +11,18 @@ import FBSDKLoginKit
 
 class OpenAppViewController: UIViewController {
 
-    var globalContainerRestaurantsLoadedEventHandler: Disposable?
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        self.navigationController?.navigationBar.isTranslucent = false
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        globalContainer.networkDelegate = self
+        globalContainer.locationManager.requestWhenInUseAuthorization()
         
-        self.navigationController?.navigationBar.isTranslucent = false
+        globalContainer.networkDelegate = self
         
         if (FBSDKAccessToken.current() == nil) {
             
@@ -40,11 +44,6 @@ class OpenAppViewController: UIViewController {
         super.viewWillDisappear(animated)
         
         self.navigationController?.setNavigationBarHidden(false, animated: true)
-    }
-    
-    deinit {
-        
-        globalContainerRestaurantsLoadedEventHandler?.dispose()
     }
     
     private func fetchRestaurants() {
@@ -89,8 +88,6 @@ class OpenAppViewController: UIViewController {
         
         if let viewController = storyboard?.instantiateViewController(withIdentifier: "mainViewController") {
             
-            globalContainerRestaurantsLoadedEventHandler?.dispose()
-            
             self.navigationController?.pushViewController(viewController, animated: true)
         }
     }
@@ -116,7 +113,10 @@ extension OpenAppViewController : NetworkDelegate {
         
         if successed {
             
-            self.navigateToMain()
+            if self.navigationController?.visibleViewController == self {
+                
+                self.navigateToMain()
+            }
             
         } else {
             

@@ -12,5 +12,24 @@ class GaleryCollectionViewCell: UICollectionViewCell {
     
     @IBOutlet weak var imageView: UIImageView!
     
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        self.clipsToBounds = true
+        self.layer.borderColor = UIColor.white.cgColor
+        self.layer.borderWidth = 1.0
+        self.layer.cornerRadius = 7.0
+    }
     
+    func setFrame(x: Int, width: CGFloat) {
+        
+        self.frame = CGRect(
+            x: CGFloat(x).remainder(dividingBy: 4) * width,
+            y: self.frame.origin.y,
+            width: width,
+            height: width
+        )
+        
+        self.imageView.frame = self.bounds
+    }
 }

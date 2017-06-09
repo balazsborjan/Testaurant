@@ -14,3 +14,13 @@ public protocol NetworkDelegate : NSObjectProtocol {
     
     func restaurantImageRequestFinished(seccessed: Bool)
 }
+
+public protocol RatingNetworkProtocol : NSObjectProtocol {
+    
+    func ratingRequestFinished(successed: Bool)
+}
+
+public protocol GaleryImageProtocol : NSObjectProtocol {
+    
+    func newImageAdded()
+}
