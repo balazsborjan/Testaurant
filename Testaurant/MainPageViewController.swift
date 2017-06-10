@@ -278,7 +278,20 @@ class MainPageViewController: UITableViewController {
                     
                     restaurantCell.nameLabel?.text = currentRestaurant.Name
                     restaurantCell.avarageRatingLabel?.text = "4,4"
-                    restaurantCell.mainPictureImageView.image = currentRestaurant.image
+                    
+                    restaurantCell.mainPictureImageView.sd_setImage(
+                        with: URL(string: currentRestaurant.MainImageURL!),
+                        completed: { (image, error, cacheType, url) in
+                            
+                            if error != nil {
+                                
+                                print("Error")
+                                
+                            } else {
+                                
+                                currentRestaurant.image = image
+                            }
+                    })
                     
                     return restaurantCell
                 }
@@ -400,51 +413,3 @@ extension MainPageViewController : UISearchBarDelegate {
         searchBar.resignFirstResponder()
     }
 }
-
-
-    
-    
-    
-//    private func showFriendList() {
-//        
-//        let request = FBSDKGraphRequest(graphPath: "me/friends", parameters: nil, httpMethod: "GET")
-//        request?.start(completionHandler: {(_ connection: FBSDKGraphRequestConnection, _ result: Any, _ error: Error?) -> Void in
-//            
-//            // Handle the result
-//            
-//            
-//        } as! FBSDKGraphRequestHandler)
-//    }
-    
-//    private func fetchUserInfo() {
-//    
-//        func fetchUserInfo() {
-//            if (FBSDKAccessToken.current() != nil) {
-//                FBSDKGraphRequest(graphPath: "me", parameters: ["fields": "id,name,link,first_name, last_name, picture.type(large), email, birthday,friends,gender,age_range,cover"]).start(completionHandler: {(_ connection: FBSDKGraphRequestConnection, _ result: Any, _ error: Error?) -> Void in
-//                    if error == nil {
-//                        //NSLog(@"result is :%@",result);
-//                        print("User ID : \((result as AnyObject).value(forKey: "id"))")
-//                        print("User Name : \((result as AnyObject).value(forKey: "name"))")
-//                        print("User First Name :\((result as AnyObject).value(forKey: "first_name"))")
-//                        print("User Last Name :\((result as AnyObject).value(forKey: "last_name"))")
-//                        print("USER Email is :\((result as AnyObject).value(forKey: "email"))")
-//                        print("User fb_Link : \((result as AnyObject).value(forKey: "link"))")
-//                        print("User Birthday : \((result as AnyObject).value(forKey: "birthday"))")
-//                        print("FB Profile Photo Link :\((result as AnyObject).value(forKey: "picture")["data"]["url"])")
-//                        print("User total friends : \((result as AnyObject).value(forKey: "friends")["summary"].value(forKey: "total_count"))")
-//                        print("User Gender : \((result as AnyObject).value(forKey: "gender"))")
-//                        print("User age_range : \((result as AnyObject).value(forKey: "age_range")["min"])")
-//                        print("User cover Photo Link : \((result as AnyObject).value(forKey: "cover")["source"])")
-//                        //Friend List ID And Name
-//                        var allKeys: [Any]? = (((result as AnyObject).value(forKey: "friends") as? [Any])?["data"] as? [Any])
-//                        fb_friend_Name = [Any]()
-//                        fb_friend_id = [Any]()
-//                        for i in 0..<allKeys?.count {
-//                            fb_friend_Name.append(result.value(forKey: "friends")["data"][i].value(forKey: "name"))
-//                            fb_friend_id.append(result.value(forKey: "friends")["data"][i].value(forKey: "id"))
-//                        }
-//                        print("Friends ID : \(fb_friend_id)")
-//                        print("Friends ID : \(fb_friend_Name)")
-//    }
-
-

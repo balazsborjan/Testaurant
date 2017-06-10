@@ -93,7 +93,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     
     @objc private func showOpenInMapAlert(_ sender: UITapGestureRecognizer) {
         
-        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let alertController = UIAlertController(title: "Navigáció", message: nil, preferredStyle: .actionSheet)
         
         alertController.addAction(UIAlertAction(title: "Maps", style: .default, handler: { (action) in
             
@@ -102,10 +102,10 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         
         alertController.addAction(UIAlertAction(title: "Google Maps", style: .default, handler: { (action) in
             
-            // Do nothing!!!
+            self.openInGoogleMaps(for: sender.view as! MKAnnotationView)
         }))
         
-        alertController.addAction(UIAlertAction(title: "Mégsem", style: .destructive, handler: { (action) in
+        alertController.addAction(UIAlertAction(title: "Mégsem", style: .cancel, handler: { (action) in
             
             // Do nothing!!!
         }))
@@ -121,6 +121,25 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             let mapItem = MKMapItem(placemark: placeMark)
             
             mapItem.openInMaps(launchOptions: nil)
+        }
+    }
+    
+    private func openInGoogleMaps(for annotationView: MKAnnotationView) {
+        
+        if let annotation = annotationView.annotation {
+            
+            let latitude = annotation.coordinate.latitude
+            let longitude = annotation.coordinate.longitude
+            
+            if (UIApplication.shared.canOpenURL(URL(string:"comgooglemaps://")!)) {
+                UIApplication.shared.open(
+                    URL(string: "comgooglemaps://?saddr=&daddr=\(latitude),\(longitude)&directionsmode=transit")!,
+                    options: [:], completionHandler: nil)
+            } else {
+                UIApplication.shared.open(
+                    URL(string: "https://www.google.com/maps/search/?api=1&query=\(latitude),\(longitude)")!,
+                        options: [:], completionHandler: nil)
+            }
         }
     }
 }

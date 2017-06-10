@@ -21,8 +21,6 @@ let globalContainer = GlobalContainer()
 
 class GlobalContainer {
     
-    let user = User()
-    
     var cdMainImages: [MainImage] = []
     var restaurants: [Restaurant] = []
     var filteredRestaurants: [Restaurant] = []
@@ -39,7 +37,7 @@ class GlobalContainer {
     
     init() {
         
-        fetchMainImages()
+        //fetchMainImages()
         setFBUserInfo()
     }
     
@@ -61,14 +59,14 @@ class GlobalContainer {
                 
                 let data = result as! [String : AnyObject]
                 
-                self.user.userID = data["id"] as? String
-                self.user.name = data["name"] as? String
-                self.user.email = data["email"] as? String
-                self.user.firstName = data["first_name"] as? String
-                self.user.lastName = data["last_name"] as? String
+                User.instance.userID = data["id"] as? String
+                User.instance.name = data["name"] as? String
+                User.instance.email = data["email"] as? String
+                User.instance.firstName = data["first_name"] as? String
+                User.instance.lastName = data["last_name"] as? String
                 
-                let url = NSURL(string: "https://graph.facebook.com/\(self.user.userID!)/picture?type=large&return_ssl_resources=1")
-                self.user.profileImage = UIImage(data: NSData(contentsOf: url! as URL)! as Data)
+                let url = NSURL(string: "https://graph.facebook.com/\(User.instance.userID!)/picture?type=large&return_ssl_resources=1")
+                User.instance.profileImage = UIImage(data: NSData(contentsOf: url! as URL)! as Data)
             }
         })
         connection.start()
@@ -98,7 +96,9 @@ class GlobalContainer {
                 
                 self.networkDelegate?.restaurantRequestFinished(successed: true)
                 
-                Restaurant.getImages(completion: self.allRestaurantsLoaded)
+                //Restaurant.getImages(completion: self.allRestaurantsLoaded)
+                
+                self.restaurantsLoadedEvent.raise(data: ())
             
             } else {
                 
@@ -115,8 +115,6 @@ class GlobalContainer {
         }
         
         self.networkDelegate?.restaurantImageRequestFinished(seccessed: true)
-        
-        //self.restaurantsLoadedEvent.raise(data: ())
     }
     
     func fetchRatingsByRestaurantID(for restaurantID: Int) -> Void {

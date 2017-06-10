@@ -23,15 +23,7 @@ class User {
     
     var profileImage: UIImage?
     
-    init(userID: String, name: String, firstName: String, lastName: String, email: String, profileImage: UIImage) {
-        
-        self.userID = userID
-        self.name = name
-        self.firstName = firstName
-        self.lastName = lastName
-        self.email = email
-        self.profileImage = profileImage
-    }
+    static let instance = User()
     
-    init() { }
+    private init() { }
 }

@@ -107,7 +107,6 @@ class RestaurantViewController: UIViewController {
         super.viewDidAppear(animated)
         
         fetchRatings()
-        restaurant?.getImages()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -297,7 +296,7 @@ extension RestaurantViewController : UICollectionViewDelegate, UICollectionViewD
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
      
-        return restaurant.images.count
+        return 5
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -308,12 +307,34 @@ extension RestaurantViewController : UICollectionViewDelegate, UICollectionViewD
             
             cell.setFrame(x: indexPath.row, width: width)
             
-            cell.imageView.image = restaurant.images[indexPath.row]
+            setImage(for: cell, at: indexPath.row + 1)
             
             return cell
         }
         
         return UICollectionViewCell()
+    }
+    
+    private func setImage(for cell: GaleryCollectionViewCell, at index: Int) {
+        
+        if let urlPath = GlobalMembers.restaurantCRUD_URLs[RestaurantCRUD.GetImageByRestaurantIDAndRowNUM] {
+            
+            let urlParameters = String(format: urlPath, restaurant.ID!, index)
+            
+            let url = GlobalMembers.mainURL + urlParameters
+            
+            cell.imageView.sd_setImage(with: URL(string: url), completed: { (image, error, cacheType, url) in
+                
+                if error != nil {
+                    
+                    print("error")
+                    
+                } else if image != nil {
+                    
+                    self.restaurant.images.append(image!)
+                }
+            })
+        }
     }
 }
 
@@ -332,7 +353,10 @@ extension RestaurantViewController : GaleryImageProtocol {
     
     func newImageAdded() {
         
-        self.galeryCollectionView.reloadData()
+        if self.navigationController?.visibleViewController == self {
+            
+            self.galeryCollectionView.reloadData()
+        }
     }
 }
 

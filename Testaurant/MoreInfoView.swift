@@ -81,12 +81,12 @@ class MoreInfoView: UIView {
         
         if self.profilePicture == nil {
             
-            self.profilePicture = globalContainer.user.profileImage
+            self.profilePicture = User.instance.profileImage
         }
         
-        if self.nameLabel.text != globalContainer.user.name {
+        if self.nameLabel.text != User.instance.name {
             
-            self.nameLabel.text = globalContainer.user.name
+            self.nameLabel.text = User.instance.name
         }
         
         self.superview?.bringSubview(toFront: self)
