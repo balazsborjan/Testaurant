@@ -18,14 +18,14 @@ class GaleryCollectionViewCell: UICollectionViewCell {
         self.clipsToBounds = true
         self.layer.borderColor = UIColor.white.cgColor
         self.layer.borderWidth = 1.0
-        self.layer.cornerRadius = 7.0
+        self.layer.cornerRadius = 5.0
     }
     
-    func setFrame(x: Int, width: CGFloat) {
+    func setFrame(at indexPath: IndexPath, width: CGFloat) {
         
         self.frame = CGRect(
-            x: CGFloat(x).remainder(dividingBy: 4) * width,
-            y: self.frame.origin.y,
+            x: CGFloat(indexPath.row) * width,
+            y: CGFloat(indexPath.section) * width,
             width: width,
             height: width
         )

@@ -1,24 +1,28 @@
 //
-//  MainPageTableViewCell.swift
+//  ReservationTableViewCell.swift
 //  Testaurant
 //
-//  Created by Balázs Bojrán on 2017. 05. 28..
+//  Created by Balázs Bojrán on 2017. 06. 11..
 //  Copyright © 2017. Kacsak. All rights reserved.
 //
 
 import UIKit
 
-class MainPageTableViewCell: UITableViewCell {
+class ReservationTableViewCell: UITableViewCell {
 
-    @IBOutlet weak var nameLabel: UILabel!
-    @IBOutlet weak var avarageRatingLabel: UILabel!
-    @IBOutlet weak var mainPictureImageView: UIImageView!
+    @IBOutlet weak var restaurantNameLabel: UILabel!
+    
+    @IBOutlet weak var selectedPeopleCountLabel: UILabel!
+    
+    @IBOutlet weak var reservationDateLabel: UILabel!
+    
+    @IBOutlet weak var restaurantImageView: UIImageView!
     
     @IBOutlet weak var view: UIView!
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        
+       
         view.clipsToBounds = true
         view.layer.cornerRadius = 5.0
     }

@@ -15,6 +15,8 @@
 		0548CCDB1EEAD40800FE76B0 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0548CCDA1EEAD40800FE76B0 /* User.swift */; };
 		057C044C1ED481FA00E6253A /* Restaurant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057C044B1ED481FA00E6253A /* Restaurant.swift */; };
 		057C044F1ED484A100E6253A /* GlobalMembers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057C044E1ED484A100E6253A /* GlobalMembers.swift */; };
+		058FDA2F1EED374900D0D710 /* ReservationsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058FDA2E1EED374900D0D710 /* ReservationsTableViewController.swift */; };
+		058FDA311EED456700D0D710 /* ReservationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058FDA301EED456700D0D710 /* ReservationTableViewCell.swift */; };
 		05A52BBD1EBB0BF000DAF16A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A52BBC1EBB0BF000DAF16A /* AppDelegate.swift */; };
 		05A52BBF1EBB0BF000DAF16A /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A52BBE1EBB0BF000DAF16A /* LoginViewController.swift */; };
 		05A52BC21EBB0BF000DAF16A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 05A52BC01EBB0BF000DAF16A /* Main.storyboard */; };
@@ -48,6 +50,8 @@
 		0548CCDA1EEAD40800FE76B0 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		057C044B1ED481FA00E6253A /* Restaurant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Restaurant.swift; sourceTree = "<group>"; };
 		057C044E1ED484A100E6253A /* GlobalMembers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalMembers.swift; sourceTree = "<group>"; };
+		058FDA2E1EED374900D0D710 /* ReservationsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReservationsTableViewController.swift; sourceTree = "<group>"; };
+		058FDA301EED456700D0D710 /* ReservationTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReservationTableViewCell.swift; sourceTree = "<group>"; };
 		05A52BB91EBB0BF000DAF16A /* Testaurant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Testaurant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		05A52BBC1EBB0BF000DAF16A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		05A52BBE1EBB0BF000DAF16A /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
@@ -176,6 +180,7 @@
 				05A52BED1EBB19A900DAF16A /* MainPageViewController.swift */,
 				05C653CF1EDEB16A00EDD1E3 /* RestaurantViewController.swift */,
 				0548CCD81EE9A66E00FE76B0 /* MapViewController.swift */,
+				058FDA2E1EED374900D0D710 /* ReservationsTableViewController.swift */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -197,6 +202,7 @@
 				05ABE7051EDB31F2003A9CCB /* MainPageTableViewCell.swift */,
 				05C653D11EDECA6000EDD1E3 /* GaleryCollectionViewCell.swift */,
 				05C653D31EDECA7700EDD1E3 /* RatingTableViewCell.swift */,
+				058FDA301EED456700D0D710 /* ReservationTableViewCell.swift */,
 			);
 			name = Cells;
 			sourceTree = "<group>";
@@ -342,8 +348,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				05B489751ED96EB000F500AB /* OpenAppViewController.swift in Sources */,
+				058FDA2F1EED374900D0D710 /* ReservationsTableViewController.swift in Sources */,
 				052D36371ED73E420086B1D5 /* MoreInfoView.swift in Sources */,
 				05C653D81EDEE2AE00EDD1E3 /* Reservation.swift in Sources */,
+				058FDA311EED456700D0D710 /* ReservationTableViewCell.swift in Sources */,
 				05C653E01EE1E5E800EDD1E3 /* NetworkDelegate.swift in Sources */,
 				0548CCD71EE936D700FE76B0 /* SelectedRestaurantView.swift in Sources */,
 				05A52BEE1EBB19A900DAF16A /* MainPageViewController.swift in Sources */,

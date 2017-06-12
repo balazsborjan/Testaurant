@@ -7,12 +7,13 @@
 //
 
 import UIKit
+import MapKit
 
 class RestaurantViewController: UIViewController {
 
     var restaurant: Restaurant!
     
-    let reservation = Reservation()
+    var reservation: Reservation!
     
     let picker = UIPickerView()
     let datePicker = UIDatePicker()
@@ -57,41 +58,61 @@ class RestaurantViewController: UIViewController {
     
     @IBOutlet weak var sendRservation: UIButton!
     
+    @IBOutlet weak var mapView: MKMapView!
+    
+    @IBOutlet var mapTapGestureRecognizer: UITapGestureRecognizer!
+    
+    var pickerTapGestureRecognizer: UITapGestureRecognizer!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.navigationItem.title = restaurant.Name
         
-        imageView.image = restaurant.image
-        
         setupPeopleCount()
+        fetchRatings()
         
+        reservation = Reservation(restaurant: self.restaurant)
+        imageView.image = restaurant.image
         addressLabel.setTitle("Cím: \(String(describing: restaurant.Address!))", for: .normal)
+        peopleCountLabel.text = String(describing: reservation.selectedPeopleCount!)
+        reservationDateLebel.text = reservation.date.toFullFormatString(withYear: false, withLongFormatMonth: true)
         
         globalContainer.ratingNetworkDelegate = self
         restaurant.galeryImageDelegate = self
         
+        sendRservation.addTarget(self, action: #selector(sendReservation(_:)), for: .touchUpInside)
+        tapGestureRecognizer.addTarget(self, action: #selector(viewTapped(_:)))
+        
+        pickerTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))
+        
         picker.delegate = self
         picker.dataSource = self
+        //picker.addGestureRecognizer(pickerTapGestureRecognizer)
         
         datePicker.minimumDate = Date()
         datePicker.datePickerMode = .dateAndTime
+        datePicker.minuteInterval = 30
+        datePicker.addTarget(self, action: #selector(reservationDateChanged), for: .valueChanged)
+        //datePicker.addGestureRecognizer(tapGestureRecognizer)
         
         peopleTextField.inputView = picker
         dateTextField.inputView = datePicker
         
-        peopleCountLabel.text = String(describing: reservation.selectedPeopleCount!)
-        reservationDateLebel.text = reservation.date.toFullFormatString(withYear: false, withLongFormatMonth: true)
-        
-        datePicker.addTarget(self, action: #selector(reservationDateChanged), for: .valueChanged)
-        sendRservation.addTarget(self, action: #selector(sendReservation(_:)), for: .touchUpInside)
-        tapGestureRecognizer.addTarget(self, action: #selector(viewTapped(_:)))
+        peopleTextField.inputView?.addGestureRecognizer(pickerTapGestureRecognizer)
+        peopleTextField.addGestureRecognizer(pickerTapGestureRecognizer)
         
         self.view.addGestureRecognizer(tapGestureRecognizer)
+        
+        setupMapView()
+        
+        // MARK: Position content view in scrollview
         
         scrollView.contentSize.height = contentView.bounds.height
         scrollView.contentSize.width = self.view.bounds.width
         scrollView.contentMode = .scaleToFill
+        
+        contentView.frame.origin.x = scrollView.frame.origin.x
         
         scrollView.addSubview(contentView)
     }
@@ -101,12 +122,6 @@ class RestaurantViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        fetchRatings()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -126,6 +141,32 @@ class RestaurantViewController: UIViewController {
             }
         }
     }
+    
+    private func setupMapView() {
+        
+        mapView.addAnnotation(restaurant)
+        
+        var zoomRect: MKMapRect = MKMapRectNull
+        
+        let annotationPoint: MKMapPoint = MKMapPointForCoordinate(restaurant.coordinate)
+        
+        let pointRect: MKMapRect = MKMapRectMake(annotationPoint.x, annotationPoint.y, 2500, 2500)
+        
+        if MKMapRectIsNull(zoomRect) {
+            
+            zoomRect = pointRect
+            
+        } else {
+            
+            zoomRect = MKMapRectUnion(zoomRect, pointRect)
+        }
+        
+        mapView.setVisibleMapRect(zoomRect, animated: true)
+        mapView.setCenter(restaurant.coordinate, animated: false)
+        
+        mapTapGestureRecognizer.addTarget(self, action: #selector(showRestaurantOnMap(_:)))
+        mapView.addGestureRecognizer(mapTapGestureRecognizer)
+    }
 
     private func fetchRatings() {
         
@@ -141,6 +182,8 @@ class RestaurantViewController: UIViewController {
     
         resignTextFieldFirstResponder()
         
+        scrollView.contentOffset.y = 0
+        
         switch sender.selectedSegmentIndex {
         case 0:
             contentView.bringSubview(toFront: reservationView)
@@ -151,8 +194,6 @@ class RestaurantViewController: UIViewController {
         default:
             break
         }
-        
-        scrollView.contentOffset.y = 0
     }
     
     @objc private func reservationDateChanged(_ sender: UIDatePicker) {
@@ -161,10 +202,15 @@ class RestaurantViewController: UIViewController {
         self.reservationDateLebel.text = sender.date.toFullFormatString(withYear: false, withLongFormatMonth: true)
     }
     
-    private func resignTextFieldFirstResponder() {
+    @objc fileprivate func resignTextFieldFirstResponder() {
         
         peopleTextField.resignFirstResponder()
         dateTextField.resignFirstResponder()
+    }
+    
+    fileprivate func addTargetToSendReservationButton(button: UIButton) {
+        
+        button.addTarget(self, action: #selector(sendReservation), for: .touchUpInside)
     }
     
     @objc private func sendReservation(_ sender: UIButton) {
@@ -176,7 +222,7 @@ class RestaurantViewController: UIViewController {
         
         alert.addAction(UIAlertAction(title: "Küldés", style: .default, handler: { (action) in
             
-            //DO NOTHING -> Majd itt kell elküldeni a dolgokat
+            self.reservation.sendReservation()
         }))
         
         alert.addAction(UIAlertAction(title: "Mégsem", style: .destructive, handler: { (action) in
@@ -187,9 +233,12 @@ class RestaurantViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
-    fileprivate func addTargetToSendReservationButton(button: UIButton) {
+    @objc private func showRestaurantOnMap(_ sender: UITapGestureRecognizer) {
         
-        button.addTarget(self, action: #selector(sendReservation), for: .touchUpInside)
+        if sender.view == mapView {
+            
+            self.performSegue(withIdentifier: "showRestaurantOnMap", sender: mapView)
+        }
     }
     
     // MARK: - Navigation
@@ -277,26 +326,67 @@ extension RestaurantViewController : UIPickerViewDataSource, UIPickerViewDelegat
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         
-        reservation.selectedPeopleCount = peopleCount[row]
-        self.peopleCountLabel.text = String(describing: (row + 1))
+        if reservation.selectedPeopleCount == peopleCount[row] {
+            
+            pickerView.endEditing(true)
+            
+        } else {
+            
+            reservation.selectedPeopleCount = peopleCount[row]
+            self.peopleCountLabel.text = String(describing: (row + 1))
+        }
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         
         return String(describing: peopleCount[row])
     }
+    
+//    func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
+//        
+//        let view = UIView(frame: CGRect(x: 0, y: 0, width: pickerView.frame.width, height: 10))
+//        
+//        let cellTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(resignTextFieldFirstResponder))
+//        
+//        view.addGestureRecognizer(cellTapGestureRecognizer)
+//        
+//        let label = UILabel(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height))
+//        
+//        label.textAlignment = .center
+//        
+//        label.text = String(describing: peopleCount[row])
+//        
+//        view.addSubview(label)
+//        
+//        return view
+//    }
 }
 
 extension RestaurantViewController : UICollectionViewDelegate, UICollectionViewDataSource {
 
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         
-        return 1
+        if restaurant.galeryImagesCount != nil {
+            
+            return restaurant.galeryImagesCount! / 4 + 1
+        }
+        
+        return 0
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
      
-        return 5
+        if restaurant.galeryImagesCount != nil {
+            
+            if ((section + 1) * 4) > restaurant.galeryImagesCount! {
+                
+                return restaurant.galeryImagesCount! - (section * 4)
+            }
+            
+            return 4
+        }
+        
+        return 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -305,9 +395,9 @@ extension RestaurantViewController : UICollectionViewDelegate, UICollectionViewD
             
             let width = collectionView.frame.width / 4
             
-            cell.setFrame(x: indexPath.row, width: width)
+            cell.setFrame(at: indexPath, width: width)
             
-            setImage(for: cell, at: indexPath.row + 1)
+            setImage(for: cell, at: indexPath)
             
             return cell
         }
@@ -315,25 +405,17 @@ extension RestaurantViewController : UICollectionViewDelegate, UICollectionViewD
         return UICollectionViewCell()
     }
     
-    private func setImage(for cell: GaleryCollectionViewCell, at index: Int) {
+    private func setImage(for cell: GaleryCollectionViewCell, at indexPath: IndexPath) {
         
         if let urlPath = GlobalMembers.restaurantCRUD_URLs[RestaurantCRUD.GetImageByRestaurantIDAndRowNUM] {
             
-            let urlParameters = String(format: urlPath, restaurant.ID!, index)
+            let imageIndex = indexPath.section * 4 + indexPath.row + 1
+            
+            let urlParameters = String(format: urlPath, restaurant.ID!, imageIndex)
             
             let url = GlobalMembers.mainURL + urlParameters
             
-            cell.imageView.sd_setImage(with: URL(string: url), completed: { (image, error, cacheType, url) in
-                
-                if error != nil {
-                    
-                    print("error")
-                    
-                } else if image != nil {
-                    
-                    self.restaurant.images.append(image!)
-                }
-            })
+            cell.imageView.sd_setImage(with: URL(string: url))
         }
     }
 }
@@ -356,6 +438,17 @@ extension RestaurantViewController : GaleryImageProtocol {
         if self.navigationController?.visibleViewController == self {
             
             self.galeryCollectionView.reloadData()
+        }
+    }
+}
+
+extension RestaurantViewController : MKMapViewDelegate {
+    
+    func mapView(_ mapView: MKMapView, didAdd views: [MKAnnotationView]) {
+        
+        for view in views {
+            
+            view.canShowCallout = false
         }
     }
 }

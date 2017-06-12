@@ -23,7 +23,14 @@ class User {
     
     var profileImage: UIImage?
     
+    var reservations = [Reservation]()
+    
     static let instance = User()
     
     private init() { }
+    
+    func getReservations(matching query: String?, completion: @escaping ([Restaurant]?) -> Void) {
+        
+        
+    }
 }

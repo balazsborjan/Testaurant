@@ -262,6 +262,11 @@ extension UIColor {
         
         self.init(red:(netHex >> 16) & 0xff, green:(netHex >> 8) & 0xff, blue:netHex & 0xff)
     }
+    
+    static func appDefault() -> UIColor {
+        
+        return UIColor(red: 62, green: 114, blue: 202)
+    }
 }
 
 extension Date {

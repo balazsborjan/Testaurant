@@ -21,7 +21,7 @@ class MoreOptionView: UIView {
         self.clipsToBounds = true
         
         let bottomBorder = UIView(frame: CGRect(origin: CGPoint(x: 0, y: self.frame.maxY - 2), size: CGSize(width: self.frame.width, height: 2)))
-        bottomBorder.backgroundColor = self.tintColor
+        bottomBorder.backgroundColor = UIColor.appDefault()
         
         self.addSubview(bottomBorder)
     }

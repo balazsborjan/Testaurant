@@ -73,6 +73,7 @@ class MainPageViewController: UITableViewController {
         tapGestureRecognizer.addTarget(self, action: #selector(closeMoreInfrmationView(_:)))
         edgeGestureRecognizer.addTarget(self, action: #selector(showMoreInformationView(_:)))
         
+        self.tableView.contentOffset = CGPoint(x: 0, y: searchBar.frame.height)
         self.tableView.addSubview(refresher)
         
         self.view.addGestureRecognizer(edgeGestureRecognizer)
@@ -102,6 +103,8 @@ class MainPageViewController: UITableViewController {
         switch identifier {
         case "logoutRow":
             button.addTarget(self, action: #selector(logout), for: .touchUpInside)
+        case "showReservationsRow":
+            button.addTarget(self, action: #selector(showReservations), for: .touchUpInside)
         default:
             break
         }
@@ -119,7 +122,7 @@ class MainPageViewController: UITableViewController {
         globalContainer.fetchRestaurants()
     }
     
-    // MARK - Login/Logout handling
+    // MARK: Login/Logout handling
     
     @objc private func logout() {
         
@@ -155,7 +158,7 @@ class MainPageViewController: UITableViewController {
         }
     }
     
-    // MARK - Open/Close Settings view
+    // MARK: Open/Close Settings view
     
     @objc private func showMoreInformationView(_ sender: Any?) {
         
@@ -214,56 +217,26 @@ class MainPageViewController: UITableViewController {
         }
     }
     
-    // MARK - TableView
+    @objc private func showReservations() {
+        
+        if let viewController = storyboard?.instantiateViewController(withIdentifier: "reservationsVC") as? ReservationsTableViewController {
+            
+            closeMoreInfrmationView(nil)
+            
+            self.navigationController?.pushViewController(viewController, animated: true)
+        }
+    }
+    
+    // MARK: TableView
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         
-        switch tableView {
-        case self.tableView:
-            
-            return filteredRestaurants.count
-            
-        default:
-            
-            return 1
-        }
+        return 1
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        switch tableView {
-        case self.tableView:
-            
-            return 1
-            
-        case self.moreInfo.tableView:
-            
-            return 5
-        
-        default:
-        
-            return 0
-        }
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        
-        if section > 0 {
-            
-            return 5.0
-        }
-        
-        return 0.0
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        
-        if section < tableView.numberOfSections - 1 {
-            
-            return 5.0
-        }
-        
-        return 0.0
+        return tableView == self.tableView ? filteredRestaurants.count : 5
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -271,10 +244,12 @@ class MainPageViewController: UITableViewController {
         if tableView == self.tableView {
         
             if let cell = tableView.dequeueReusableCell(withIdentifier: "searchRestaurantCell") {
+        
+                cell.backgroundColor = tableView.backgroundColor
                 
                 if let restaurantCell = cell as? MainPageTableViewCell {
                     
-                    let currentRestaurant = filteredRestaurants[indexPath.section]
+                    let currentRestaurant = filteredRestaurants[indexPath.row]
                     
                     restaurantCell.nameLabel?.text = currentRestaurant.Name
                     restaurantCell.avarageRatingLabel?.text = "4,4"
@@ -292,9 +267,9 @@ class MainPageViewController: UITableViewController {
                                 currentRestaurant.image = image
                             }
                     })
-                    
-                    return restaurantCell
                 }
+                
+                return cell
             }
             
         } else if tableView == self.moreInfo.tableView {
@@ -316,6 +291,19 @@ class MainPageViewController: UITableViewController {
         }
         
         return UITableViewCell()
+    }
+    
+    override func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
+        
+        return true
+    }
+    
+    override func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
+        
+//        if let cell = tableView.cellForRow(at: indexPath) as? MainPageTableViewCell {
+//            
+//            cell.backgroundColor = UIColor.white
+//        }
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -358,7 +346,7 @@ class MainPageViewController: UITableViewController {
                     
                     if let indexPath = self.tableView.indexPath(for: cell) {
                         
-                        let selectedRestaurant = filteredRestaurants[indexPath.section]
+                        let selectedRestaurant = filteredRestaurants[indexPath.row]
                         
                         if let restaurantViewController = segue.destination as? RestaurantViewController {
                             

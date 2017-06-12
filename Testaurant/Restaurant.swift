@@ -170,11 +170,9 @@ class Restaurant: NSObject, MKAnnotation {
                     
                 } else {
                     
-                    let returnData = String(describing: response)
-                    
-                    if returnData.lengthOfBytes(using: .utf8) > 0 {
+                    if let json = try? JSONSerialization.jsonObject(with: data!, options:.allowFragments) {
                         
-                        self.galeryImagesCount = Int(returnData)
+                        self.galeryImagesCount = Int(json as! NSNumber)
                     }
                 }
                 
