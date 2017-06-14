@@ -267,6 +267,13 @@ extension UIColor {
         
         return UIColor(red: 62, green: 114, blue: 202)
     }
+    
+    static func tableViewBackgroundDefault() -> UIColor {
+        
+        return UIColor(red: 186, green: 185, blue: 185).withAlphaComponent(0.95)
+        
+        
+    }
 }
 
 extension Date {

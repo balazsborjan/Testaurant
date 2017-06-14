@@ -83,6 +83,12 @@ class MainPageViewController: UITableViewController {
         self.navigationItem.rightBarButtonItem = showMoreOptionsBarButtonItem
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        self.navigationItem.title = "\(filteredRestaurants.count) találat"
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
@@ -219,12 +225,7 @@ class MainPageViewController: UITableViewController {
     
     @objc private func showReservations() {
         
-        if let viewController = storyboard?.instantiateViewController(withIdentifier: "reservationsVC") as? ReservationsTableViewController {
-            
-            closeMoreInfrmationView(nil)
-            
-            self.navigationController?.pushViewController(viewController, animated: true)
-        }
+        self.performSegue(withIdentifier: "showReservations", sender: self)
     }
     
     // MARK: TableView
@@ -269,6 +270,8 @@ class MainPageViewController: UITableViewController {
                     })
                 }
                 
+                cell.selectionStyle = .none
+                
                 return cell
             }
             
@@ -291,19 +294,6 @@ class MainPageViewController: UITableViewController {
         }
         
         return UITableViewCell()
-    }
-    
-    override func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
-        
-        return true
-    }
-    
-    override func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
-        
-//        if let cell = tableView.cellForRow(at: indexPath) as? MainPageTableViewCell {
-//            
-//            cell.backgroundColor = UIColor.white
-//        }
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -336,7 +326,10 @@ class MainPageViewController: UITableViewController {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
+        closeMoreInfrmationView(nil)
         closeMoreOptionView()
+        
+        self.navigationItem.title = ""
         
         if let cell = sender as? MainPageTableViewCell {
             

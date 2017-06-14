@@ -15,9 +15,6 @@ class RestaurantViewController: UIViewController {
     
     var reservation: Reservation!
     
-    let picker = UIPickerView()
-    let datePicker = UIDatePicker()
-    
     var peopleCount: [Int] = []
     
     var ratings: [Rating] = [] {
@@ -34,7 +31,7 @@ class RestaurantViewController: UIViewController {
     
     @IBOutlet weak var openingTimeLabel: UIButton!
     
-    @IBOutlet weak var addressLabel: UIButton!
+    @IBOutlet weak var addressLabel: UILabel!
     
     @IBOutlet var contentView: SelectedRestaurantContentView!
     
@@ -56,6 +53,12 @@ class RestaurantViewController: UIViewController {
     
     @IBOutlet weak var dateTextField: UITextField!
     
+    @IBOutlet var keyboardView: UIView!
+    
+    @IBOutlet weak var keyboardPicker: UIPickerView!
+    
+    @IBOutlet weak var keyboardDatePicker: UIDatePicker!
+    
     @IBOutlet weak var sendRservation: UIButton!
     
     @IBOutlet weak var mapView: MKMapView!
@@ -67,46 +70,32 @@ class RestaurantViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.navigationItem.title = restaurant.Name
+        globalContainer.ratingNetworkDelegate = self
+        restaurant.galeryImageDelegate = self
         
         setupPeopleCount()
         fetchRatings()
         
         reservation = Reservation(restaurant: self.restaurant)
+        
         imageView.image = restaurant.image
-        addressLabel.setTitle("Cím: \(String(describing: restaurant.Address!))", for: .normal)
+        addressLabel.text = "Cím: \(String(describing: restaurant.Address!))"
         peopleCountLabel.text = String(describing: reservation.selectedPeopleCount!)
         reservationDateLebel.text = reservation.date.toFullFormatString(withYear: false, withLongFormatMonth: true)
         
-        globalContainer.ratingNetworkDelegate = self
-        restaurant.galeryImageDelegate = self
+        keyboardDatePicker.minimumDate = Date()
+        keyboardDatePicker.addTarget(self, action: #selector(reservationDateChanged(_:)), for: .valueChanged)
+        keyboardView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:))))
+        
+        peopleTextField.inputView = keyboardView
+        dateTextField.inputView = keyboardView
         
         sendRservation.addTarget(self, action: #selector(sendReservation(_:)), for: .touchUpInside)
         tapGestureRecognizer.addTarget(self, action: #selector(viewTapped(_:)))
         
-        pickerTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))
-        
-        picker.delegate = self
-        picker.dataSource = self
-        //picker.addGestureRecognizer(pickerTapGestureRecognizer)
-        
-        datePicker.minimumDate = Date()
-        datePicker.datePickerMode = .dateAndTime
-        datePicker.minuteInterval = 30
-        datePicker.addTarget(self, action: #selector(reservationDateChanged), for: .valueChanged)
-        //datePicker.addGestureRecognizer(tapGestureRecognizer)
-        
-        peopleTextField.inputView = picker
-        dateTextField.inputView = datePicker
-        
-        peopleTextField.inputView?.addGestureRecognizer(pickerTapGestureRecognizer)
-        peopleTextField.addGestureRecognizer(pickerTapGestureRecognizer)
-        
         self.view.addGestureRecognizer(tapGestureRecognizer)
         
         setupMapView()
-        
-        // MARK: Position content view in scrollview
         
         scrollView.contentSize.height = contentView.bounds.height
         scrollView.contentSize.width = self.view.bounds.width
@@ -119,6 +108,8 @@ class RestaurantViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        self.navigationItem.title = restaurant.Name
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
@@ -173,7 +164,7 @@ class RestaurantViewController: UIViewController {
         globalContainer.fetchRatingsByRestaurantID(for: self.restaurant.ID!)
     }
     
-    func viewTapped(_ sender: UITapGestureRecognizer) {
+    func viewTapped(_ sender: Any?) {
         
         resignTextFieldFirstResponder()
     }
@@ -247,6 +238,8 @@ class RestaurantViewController: UIViewController {
         
         resignTextFieldFirstResponder()
         
+        self.navigationItem.title = ""
+        
         if let identifier = segue.identifier {
             
             if identifier == "showRestaurantOnMap" {
@@ -289,9 +282,15 @@ extension RestaurantViewController : UITextFieldDelegate {
         
         if textField.isEqual(self.peopleTextField) {
             
+            textField.inputView?.sendSubview(toBack: keyboardDatePicker)
+            textField.inputView?.bringSubview(toFront: keyboardPicker)
+            
             self.peopleCountLabel.textColor = self.view.tintColor
             
         } else if textField.isEqual(self.dateTextField) {
+            
+            textField.inputView?.sendSubview(toBack: keyboardPicker)
+            textField.inputView?.bringSubview(toFront: keyboardDatePicker)
             
             self.reservationDateLebel.textColor = self.view.tintColor
         }
@@ -341,25 +340,6 @@ extension RestaurantViewController : UIPickerViewDataSource, UIPickerViewDelegat
         
         return String(describing: peopleCount[row])
     }
-    
-//    func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
-//        
-//        let view = UIView(frame: CGRect(x: 0, y: 0, width: pickerView.frame.width, height: 10))
-//        
-//        let cellTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(resignTextFieldFirstResponder))
-//        
-//        view.addGestureRecognizer(cellTapGestureRecognizer)
-//        
-//        let label = UILabel(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height))
-//        
-//        label.textAlignment = .center
-//        
-//        label.text = String(describing: peopleCount[row])
-//        
-//        view.addSubview(label)
-//        
-//        return view
-//    }
 }
 
 extension RestaurantViewController : UICollectionViewDelegate, UICollectionViewDataSource {
@@ -453,20 +433,27 @@ extension RestaurantViewController : MKMapViewDelegate {
     }
 }
 
+extension RestaurantViewController : UIGestureRecognizerDelegate {
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        
+        return true
+    }
+}
+
 extension RestaurantViewController {
     
     func keyboardWillShow(notification: NSNotification) {
         
-        if let keyboardSize = (notification.userInfo?[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
+        scrollView.contentOffset.y = 0
+        
+        let keyboardRectTopY = self.view.frame.height - keyboardView.frame.height
+        
+        let reservationButtonBottomY = sendRservation.frame.maxY + scrollView.frame.minY
+        
+        if reservationButtonBottomY > keyboardRectTopY {
             
-            let keyboardRectTopY = self.view.frame.height - keyboardSize.height
-            
-            let textFieldBottomY = dateTextField.frame.maxY + reservationView.frame.minY + (navigationController?.navigationBar.frame.height)!
-            
-            if textFieldBottomY > keyboardRectTopY {
-                
-                self.view.frame.origin.y = 0 - (textFieldBottomY - keyboardRectTopY)
-            }
+            self.view.frame.origin.y = (navigationController?.navigationBar.frame.maxY)! - (reservationButtonBottomY - keyboardView.frame.height)
         }
     }
     
@@ -475,3 +462,9 @@ extension RestaurantViewController {
         self.view.frame.origin.y = (navigationController?.navigationBar.frame.maxY)!
     }
 }
+
+
+
+
+
+
