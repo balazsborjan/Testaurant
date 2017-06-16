@@ -37,7 +37,6 @@ class GlobalContainer {
     
     init() {
         
-        //fetchMainImages()
         setFBUserInfo()
     }
     
@@ -67,9 +66,17 @@ class GlobalContainer {
                 
                 let url = NSURL(string: "https://graph.facebook.com/\(User.instance.userID!)/picture?type=large&return_ssl_resources=1")
                 User.instance.profileImage = UIImage(data: NSData(contentsOf: url! as URL)! as Data)
+                
+                self.getUserReservations()
+                //print(User.instance.userID)
             }
         })
         connection.start()
+    }
+    
+    private func getUserReservations() {
+        
+        User.instance.getReservations()
     }
     
     private func fetchMainImages() {
@@ -95,8 +102,6 @@ class GlobalContainer {
                 self.restaurants = newRestaurants!
                 
                 self.networkDelegate?.restaurantRequestFinished(successed: true)
-                
-                //Restaurant.getImages(completion: self.allRestaurantsLoaded)
                 
                 self.restaurantsLoadedEvent.raise(data: ())
             
@@ -156,6 +161,12 @@ struct GlobalMembers {
         
         .SelectByRestaurantID : "GetRatingByRestaurantID/"
     ]
+    
+    static let reservationCRUD_URLs: Dictionary<ReservationCRUD, String> = [
+        
+        .SelectByUserID : "GetReservationsByUserID/%@",
+        .Create : "InsertReservation/%@/%@/%@/%@"
+    ]
 }
 
 enum RestaurantCRUD {
@@ -172,6 +183,16 @@ enum RatingCRUD {
     
     case Select
     case SelectByRestaurantID
+    case Create
+    case Update
+    case Delete
+}
+
+enum ReservationCRUD {
+    
+    case Select
+    case SelectByRestaurantID
+    case SelectByUserID
     case Create
     case Update
     case Delete
@@ -309,6 +330,24 @@ extension Date {
         return dateFormatter.string(from: self)
     }
     
+    func toFullFormatString() -> String {
+        
+        let dateFormatter = DateFormatter()
+        
+        dateFormatter.dateFormat = "yyyyMMddHHmm"
+        
+        return dateFormatter.string(from: self)
+    }
+    
+    static func fromFullFormat(string date: String) -> Date {
+        
+        let dateFormatter = DateFormatter()
+        
+        dateFormatter.dateFormat = "yyyyMMddHHmm"
+        
+        return dateFormatter.date(from: date)!
+    }
+    
     func toString() -> String {
         
         let dateFormatter = DateFormatter()
@@ -318,8 +357,19 @@ extension Date {
     }
 }
 
+extension Array where Element == Float {
+    /// Returns the sum of all elements in the array
+    var total: Element {
+        return reduce(0, +)
+    }
+    /// Returns the average of all elements in the array
+    var average: Double {
+        return isEmpty ? 0 : Double(reduce(0, +)) / Double(count)
+    }
+}
 
 
+//let str = NSString(format:"%d , %f, %ld, %@", INT_VALUE, FLOAT_VALUE, DOUBLE_VALUE, STRING_VALUE)
 
 
 

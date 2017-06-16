@@ -46,7 +46,9 @@ class Restaurant: NSObject, MKAnnotation {
     
     var galeryImageDelegate : GaleryImageProtocol?
     
-    var ratingCount: Int?  // Kell egy tábla majd, amiben az értékelések lesznek, ennek lesz egy foreignkey oszlopa a restaurantID-vel, ebből kell majd Count()-al kivenni ezt, mégpedig akkor, amikor kiválasztjuk a listából az adott éttermet.
+    var ratingCount: Int?
+    
+    var ratingAvg: Double?
     
     init(id: Int, address: String, name: String, maxPeaopleAtTable: Int, openingTime: String, mainImageURL: String) {
         super.init()

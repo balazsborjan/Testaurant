@@ -10,7 +10,7 @@ import UIKit
 
 class ReservationsTableViewController: UITableViewController {
 
-    let activeReservations = User.instance.reservations.filter { $0.date > Date() }
+    let activeReservations = User.instance.reservations.filter { $0.date >= Date() }
     
     let pastReservations = User.instance.reservations.filter { $0.date < Date() }
     

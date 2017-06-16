@@ -24,3 +24,8 @@ public protocol GaleryImageProtocol : NSObjectProtocol {
     
     func newImageAdded()
 }
+
+public protocol FBUserInfoDelegate : NSObjectProtocol {
+    
+    func didGetUserInfo(successed: Bool)
+}

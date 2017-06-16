@@ -55,6 +55,8 @@ class RestaurantViewController: UIViewController {
     
     @IBOutlet var keyboardView: UIView!
     
+    //@IBOutlet weak var keyboardDoneLabel: UILabel!
+    
     @IBOutlet weak var keyboardPicker: UIPickerView!
     
     @IBOutlet weak var keyboardDatePicker: UIDatePicker!
@@ -85,7 +87,7 @@ class RestaurantViewController: UIViewController {
         
         keyboardDatePicker.minimumDate = Date()
         keyboardDatePicker.addTarget(self, action: #selector(reservationDateChanged(_:)), for: .valueChanged)
-        keyboardView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:))))
+        //keyboardDoneLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:))))
         
         peopleTextField.inputView = keyboardView
         dateTextField.inputView = keyboardView
@@ -187,6 +189,12 @@ class RestaurantViewController: UIViewController {
         }
     }
     
+    @IBAction func hideKeyboard(_ sender: UIButton) {
+        
+        self.viewTapped(sender)
+    }
+    
+    
     @objc private func reservationDateChanged(_ sender: UIDatePicker) {
         
         reservation.date = sender.date
@@ -213,7 +221,7 @@ class RestaurantViewController: UIViewController {
         
         alert.addAction(UIAlertAction(title: "Küldés", style: .default, handler: { (action) in
             
-            self.reservation.sendReservation()
+            self.reservation.sendReservation(completion: self.reservationSent)
         }))
         
         alert.addAction(UIAlertAction(title: "Mégsem", style: .destructive, handler: { (action) in
@@ -222,6 +230,36 @@ class RestaurantViewController: UIViewController {
         }))
         
         self.present(alert, animated: true, completion: nil)
+    }
+    
+    private func reservationSent() -> Void {
+        
+        showReservationStatusAlert()
+    }
+    
+    private func showReservationStatusAlert() {
+     
+        let alert = UIAlertController(
+            title: "Foglalás elküldve",
+            message: "A foglalás sikeresen feldolgozásra került\nKöszönjük",
+            preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "Rendben", style: .default, handler: { (action) in
+            
+            //DO NOTHING
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Megtekintem", style: .destructive, handler: { (action) in
+            
+            self.showReservation()
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    private func showReservation() {
+        
+        self.performSegue(withIdentifier: "showNewReservation", sender: self)
     }
     
     @objc private func showRestaurantOnMap(_ sender: UITapGestureRecognizer) {
@@ -267,14 +305,22 @@ extension RestaurantViewController : UITableViewDelegate, UITableViewDataSource 
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = RatingTableViewCell(style: .value1, reuseIdentifier: nil)
+        if let cell = tableView.dequeueReusableCell(withIdentifier: "ratingCell", for: indexPath) as? RatingTableViewCell {
+            
+            let rating = ratings[indexPath.row]
+            
+            cell.nameLabel.text = rating.userName
+            cell.ratingTextLabel.text = rating.Text
+            cell.ratingValueLabel.text = String(describing: rating.Value)
+            
+            return cell
+        }
         
-        cell.textLabel?.text = ratings[indexPath.row].userName
-        cell.detailTextLabel?.text = String(describing: ratings[indexPath.row].Value)
-        
-        return cell
+        return UITableViewCell()
     }
 }
+
+//sextension RestaurantViewController :
 
 extension RestaurantViewController : UITextFieldDelegate {
     
@@ -407,6 +453,27 @@ extension RestaurantViewController : RatingNetworkProtocol {
         if successed {
             
             self.ratings = globalContainer.ratings[self.restaurant.ID!]!
+            
+            var values = [Float]()
+            
+            for r in ratings {
+                
+                r.userInfoDelegate = self
+                values.append(r.Value)
+            }
+            
+            self.restaurant.ratingAvg = values.average
+        }
+    }
+}
+
+extension RestaurantViewController : FBUserInfoDelegate {
+    
+    func didGetUserInfo(successed: Bool) {
+        
+        if successed {
+            
+            self.ratingTableView.reloadData()
         }
     }
 }

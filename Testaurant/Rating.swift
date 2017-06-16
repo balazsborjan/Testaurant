@@ -23,6 +23,8 @@ class Rating {
     
     var userName: String?
     
+    var userInfoDelegate: FBUserInfoDelegate?
+    
     init?(json: [String: AnyObject]) {
         
         guard let id = json["ID"] as? Int,
@@ -100,9 +102,7 @@ class Rating {
     private func getUserNameByUserID() -> Void {
         
         
-        let id = FBSDKAccessToken.current().userID
-        
-        let graphRequest = FBSDKGraphRequest(graphPath: "/\(String(describing: id))/friendlists", parameters: ["fields" : "id, name"], httpMethod: "GET")
+        let graphRequest = FBSDKGraphRequest(graphPath: User.instance.userID!, parameters: ["fields" : "id, name"], httpMethod: "GET")
         let connection = FBSDKGraphRequestConnection()
         
         connection.setDelegateQueue(OperationQueue.main)
@@ -118,6 +118,8 @@ class Rating {
                 let data = result as! [String : AnyObject]
                 
                 self.userName = data["name"] as? String
+                
+                self.userInfoDelegate?.didGetUserInfo(successed: true)
             }
         }
         
