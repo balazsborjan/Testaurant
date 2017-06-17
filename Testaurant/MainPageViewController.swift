@@ -10,19 +10,19 @@ import UIKit
 import FBSDKLoginKit
 import Foundation
 
-class MainPageViewController: UITableViewController {
+class MainPageViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     var moreInfoChangeStateEventHandler: Disposable?
     
     var globalContainerRestaurantsLoadedEventHandler: Disposable?
+    
+    @IBOutlet var tableView: UITableView!
     
     @IBOutlet weak var tableHeaderLabel: UILabel!
     
     @IBOutlet var moreInfo: MoreInfoView!
     
     @IBOutlet var moreOption: MoreOptionView!
-    
-    let visualEffectView   = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
     
     @IBOutlet weak var navigationitem: UINavigationItem!
     
@@ -33,8 +33,6 @@ class MainPageViewController: UITableViewController {
     @IBOutlet weak var searchBar: UISearchBar!
     
     @IBOutlet var tapGestureRecognizer: UITapGestureRecognizer!
-
-    @IBOutlet var panGestureRecognizer: UIPanGestureRecognizer!
     
     @IBOutlet var edgeGestureRecognizer: UIScreenEdgePanGestureRecognizer!
     
@@ -60,6 +58,8 @@ class MainPageViewController: UITableViewController {
     
     private let moreInfoTableViewCellIdentifiers = ["showProfileRow", "showReservationsRow", "showSettingsRow", "emptyRow", "logoutRow"]
     
+    let navBarVisualEffectView   = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -73,8 +73,6 @@ class MainPageViewController: UITableViewController {
         
         globalContainerRestaurantsLoadedEventHandler = globalContainer.restaurantsLoadedEvent.addHandler(target: self, handler: populateTableView)
         
-        setupMoreOptionView()
-        
         tapGestureRecognizer.addTarget(self, action: #selector(closeMoreInfrmationView(_:)))
         edgeGestureRecognizer.addTarget(self, action: #selector(showMoreInformationView(_:)))
         
@@ -82,7 +80,9 @@ class MainPageViewController: UITableViewController {
         self.tableView.addSubview(refresher)
         
         self.view.addGestureRecognizer(edgeGestureRecognizer)
+        self.view.addSubview(navBarVisualEffectView)
         
+        setupMoreOptionView()
         setNavigationBar()
     }
     
@@ -94,8 +94,6 @@ class MainPageViewController: UITableViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        self.navigationController?.navigationBar.sendSubview(toBack: visualEffectView)
         
         if globalContainer.restaurants.count != self.restaurants.count {
             
@@ -116,11 +114,12 @@ class MainPageViewController: UITableViewController {
         self.navigationController?.view.insertSubview(moreOption, at: 2)
         self.navigationItem.rightBarButtonItem = showMoreOptionsBarButtonItem
         
-        visualEffectView.frame =  (self.navigationController?.navigationBar.bounds.insetBy(dx: 0, dy: -10).offsetBy(dx: 0, dy: -10))!
-        self.navigationController?.navigationBar.isTranslucent = true
-        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        self.navigationController?.navigationBar.shadowImage = UIImage()
-        self.navigationController?.navigationBar.insertSubview(visualEffectView, at: self.navigationController!.navigationBar.subviews.count)
+        navBarVisualEffectView.frame = CGRect(
+            x: 0,
+            y: 0 - self.searchBar.frame.height,
+            width: self.view.frame.width,
+            height: ((self.navigationController?.navigationBar.frame.maxY)! + self.searchBar.frame.height)
+        )
     }
     
     private func setupMoreOptionView() {
@@ -219,6 +218,10 @@ class MainPageViewController: UITableViewController {
         UIView.animate(withDuration: 0.2) {
             self.moreOption.frame.origin.y = (self.navigationController?.navigationBar.frame.maxY)!
         }
+        
+        UIView.animate(withDuration: 0.25, animations: {
+            self.navBarVisualEffectView.frame.origin.y = 0
+        })
     }
     
     private func closeMoreOptionView() {
@@ -228,6 +231,10 @@ class MainPageViewController: UITableViewController {
         UIView.animate(withDuration: 0.2) {
             self.moreOption.frame.origin.y = 0 - self.moreOption.frame.height
         }
+        
+        UIView.animate(withDuration: 0.15, animations: {
+            self.navBarVisualEffectView.frame.origin.y = 0 - self.searchBar.frame.height
+        })
     }
     
     private func switchMainViewAccessibility(to isEnabled: Bool) {
@@ -259,17 +266,17 @@ class MainPageViewController: UITableViewController {
     
     // MARK: TableView
     
-    override func numberOfSections(in tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         
         return 1
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         return tableView == self.tableView ? filteredRestaurants.count : 5
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         if tableView == self.tableView {
         
@@ -325,7 +332,7 @@ class MainPageViewController: UITableViewController {
         return UITableViewCell()
     }
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         searchBar.resignFirstResponder()
         
@@ -335,7 +342,7 @@ class MainPageViewController: UITableViewController {
         }
     }
     
-    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
         searchBar.resignFirstResponder()
         closeMoreOptionView()
@@ -373,7 +380,6 @@ class MainPageViewController: UITableViewController {
                         if let restaurantViewController = segue.destination as? RestaurantViewController {
                             
                             restaurantViewController.restaurant = selectedRestaurant
-                            restaurantViewController.navigationItem.title = selectedRestaurant.Name
                         }
                     }
                 }
@@ -399,11 +405,6 @@ extension MainPageViewController : UISearchBarDelegate {
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         
-        searchBar.showsCancelButton = true
-    }
-    
-    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        
         searchBar.showsCancelButton = false
     }
     
@@ -422,5 +423,12 @@ extension MainPageViewController : UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
         searchBar.resignFirstResponder()
+    }
+    
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        
+        tableView.setContentOffset(tableView.contentOffset, animated: false)
+        
+        return true
     }
 }

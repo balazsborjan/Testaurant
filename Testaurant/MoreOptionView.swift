@@ -10,10 +10,6 @@ import UIKit
 
 class MoreOptionView: UIView {
 
-//    @IBOutlet weak var sortButton: UIButton!
-//    @IBOutlet weak var filterButton: UIButton!
-//    @IBOutlet weak var showMapButton: UIButton!
-    
     func setFrame(by searchBarFrame: CGRect) {
         
         self.frame = searchBarFrame

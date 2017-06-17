@@ -21,13 +21,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // MARK: Facebook SDK
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
         
-        //UINavigationBar.appearance().barTintColor = UIColor(red: 0, green: 122, blue: 255)
         UINavigationBar.appearance().barTintColor = UIColor.white //.appDefault()
         UINavigationBar.appearance().tintColor = UIColor.darkGray
         UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName: UIColor.darkGray]
-        
-        UIBarButtonItem.appearance()
-        //appearanceWhenContained(in: UINavigationBar.self, nil).setBackButtonBackgroundVerticalPositionAdjustment(-3, forBarMetrics: .default)
+        UINavigationBar.appearance().setBackgroundImage(UIImage(), for: .default)
+        UINavigationBar.appearance().isTranslucent = true
         
         return true
     }

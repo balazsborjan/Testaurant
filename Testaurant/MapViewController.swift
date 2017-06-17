@@ -18,8 +18,16 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     
     var mapViewFinishedLoading = false
     
+    let navBarVisualEffectView   = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        navBarVisualEffectView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.navigationController!.navigationBar.frame.maxY)
+        
+        self.navigationController?.navigationBar.isTranslucent = true
+        
+        self.view.addSubview(navBarVisualEffectView)
         
         mapView.delegate = self
         

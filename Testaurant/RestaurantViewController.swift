@@ -23,6 +23,8 @@ class RestaurantViewController: UIViewController {
         }
     }
     
+    @IBOutlet weak var fullContentView: UIView!
+    
     @IBOutlet weak var imageView: UIImageView!
     
     @IBOutlet weak var scrollView: UIScrollView!
@@ -65,6 +67,8 @@ class RestaurantViewController: UIViewController {
     
     var pickerTapGestureRecognizer: UITapGestureRecognizer!
     
+    let navBarVisualEffectView   = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -91,8 +95,6 @@ class RestaurantViewController: UIViewController {
         sendRservation.addTarget(self, action: #selector(sendReservation(_:)), for: .touchUpInside)
         tapGestureRecognizer.addTarget(self, action: #selector(viewTapped(_:)))
         
-        self.view.addGestureRecognizer(tapGestureRecognizer)
-        
         scrollView.contentSize.height = contentView.bounds.height
         scrollView.contentSize.width = self.view.bounds.width
         scrollView.contentMode = .scaleToFill
@@ -100,10 +102,17 @@ class RestaurantViewController: UIViewController {
         contentView.frame.origin.x = scrollView.frame.origin.x
         
         scrollView.addSubview(contentView)
+        
+        navBarVisualEffectView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.navigationController!.navigationBar.frame.maxY)
+        
+        self.view.addGestureRecognizer(tapGestureRecognizer)
+        self.view.addSubview(navBarVisualEffectView)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        self.navigationItem.title = "\(restaurant.Name!)"
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
@@ -112,11 +121,7 @@ class RestaurantViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        if let visualEffectView = self.navigationController?.navigationBar.subviews.filter({ $0 is UIVisualEffectView }).first {
-            
-            self.navigationController?.navigationBar.sendSubview(toBack: visualEffectView)
-            
-        }
+        self.view.bringSubview(toFront: navBarVisualEffectView)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -526,17 +531,17 @@ extension RestaurantViewController {
         
         let keyboardRectTopY = self.view.frame.height - keyboardView.frame.height
         
-        let reservationButtonBottomY = sendRservation.frame.maxY + scrollView.frame.minY
+        let reservationButtonBottomY = self.fullContentView.frame.minY + sendRservation.frame.maxY + scrollView.frame.minY
         
         if reservationButtonBottomY > keyboardRectTopY {
             
-            self.view.frame.origin.y = (navigationController?.navigationBar.frame.maxY)! - (reservationButtonBottomY - keyboardView.frame.height)
+            self.fullContentView.frame.origin.y = navigationController!.navigationBar.frame.maxY - segmentControl.frame.minY
         }
     }
     
     func keyboardWillHide(notification: NSNotification) {
         
-        self.view.frame.origin.y = 0
+        self.fullContentView.frame.origin.y = navigationController!.navigationBar.frame.maxY
     }
 }
 
