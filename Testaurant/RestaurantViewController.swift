@@ -25,8 +25,6 @@ class RestaurantViewController: UIViewController {
     
     @IBOutlet weak var imageView: UIImageView!
     
-    var image: UIImage?
-    
     @IBOutlet weak var scrollView: UIScrollView!
     
     @IBOutlet weak var openingTimeLabel: UIButton!
@@ -55,8 +53,6 @@ class RestaurantViewController: UIViewController {
     
     @IBOutlet var keyboardView: UIView!
     
-    //@IBOutlet weak var keyboardDoneLabel: UILabel!
-    
     @IBOutlet weak var keyboardPicker: UIPickerView!
     
     @IBOutlet weak var keyboardDatePicker: UIDatePicker!
@@ -75,19 +71,19 @@ class RestaurantViewController: UIViewController {
         globalContainer.ratingNetworkDelegate = self
         restaurant.galeryImageDelegate = self
         
-        setupPeopleCount()
         fetchRatings()
+        setupImageView()
+        setupPeopleCount()
+        setupMapView()
         
         reservation = Reservation(restaurant: self.restaurant)
         
-        imageView.image = restaurant.image
         addressLabel.text = "Cím: \(String(describing: restaurant.Address!))"
         peopleCountLabel.text = String(describing: reservation.selectedPeopleCount!)
         reservationDateLebel.text = reservation.date.toFullFormatString(withYear: false, withLongFormatMonth: true)
         
         keyboardDatePicker.minimumDate = Date()
         keyboardDatePicker.addTarget(self, action: #selector(reservationDateChanged(_:)), for: .valueChanged)
-        //keyboardDoneLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:))))
         
         peopleTextField.inputView = keyboardView
         dateTextField.inputView = keyboardView
@@ -96,8 +92,6 @@ class RestaurantViewController: UIViewController {
         tapGestureRecognizer.addTarget(self, action: #selector(viewTapped(_:)))
         
         self.view.addGestureRecognizer(tapGestureRecognizer)
-        
-        setupMapView()
         
         scrollView.contentSize.height = contentView.bounds.height
         scrollView.contentSize.width = self.view.bounds.width
@@ -111,10 +105,18 @@ class RestaurantViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        self.navigationItem.title = restaurant.Name
-        
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        if let visualEffectView = self.navigationController?.navigationBar.subviews.filter({ $0 is UIVisualEffectView }).first {
+            
+            self.navigationController?.navigationBar.sendSubview(toBack: visualEffectView)
+            
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -133,6 +135,13 @@ class RestaurantViewController: UIViewController {
                 peopleCount.append(i)
             }
         }
+    }
+    
+    private func setupImageView() {
+        
+        imageView.image = restaurant.image
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 5.0
     }
     
     private func setupMapView() {
@@ -166,7 +175,7 @@ class RestaurantViewController: UIViewController {
         globalContainer.fetchRatingsByRestaurantID(for: self.restaurant.ID!)
     }
     
-    func viewTapped(_ sender: Any?) {
+    @objc private func viewTapped(_ sender: Any?) {
         
         resignTextFieldFirstResponder()
     }
@@ -180,10 +189,13 @@ class RestaurantViewController: UIViewController {
         switch sender.selectedSegmentIndex {
         case 0:
             contentView.bringSubview(toFront: reservationView)
+            scrollView.isUserInteractionEnabled = true
         case 1:
             contentView.bringSubview(toFront: galeryCollectionView)
+            scrollView.isUserInteractionEnabled = false
         case 2:
             contentView.bringSubview(toFront: ratingTableView)
+            scrollView.isUserInteractionEnabled = false
         default:
             break
         }
@@ -319,8 +331,6 @@ extension RestaurantViewController : UITableViewDelegate, UITableViewDataSource 
         return UITableViewCell()
     }
 }
-
-//sextension RestaurantViewController :
 
 extension RestaurantViewController : UITextFieldDelegate {
     
@@ -526,7 +536,7 @@ extension RestaurantViewController {
     
     func keyboardWillHide(notification: NSNotification) {
         
-        self.view.frame.origin.y = (navigationController?.navigationBar.frame.maxY)!
+        self.view.frame.origin.y = 0
     }
 }
 

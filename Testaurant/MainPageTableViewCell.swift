@@ -22,16 +22,8 @@ class MainPageTableViewCell: UITableViewCell {
         view.clipsToBounds = true
         view.layer.cornerRadius = 5.0
         
-        //view.layer.masksToBounds = false
-//        view.layer.shadowColor = UIColor.black.cgColor
-//        view.layer.shadowOpacity = 0.5
-//        view.layer.shadowOffset = CGSize(width: -1, height: 1)
-//        view.layer.shadowRadius = 1
-//        
-//        view.layer.shadowPath = UIBezierPath(rect: view.bounds).cgPath
-//        view.layer.shouldRasterize = true
-//        
-//        view.layer.rasterizationScale = UIScreen.main.scale
+        mainPictureImageView.clipsToBounds = true
+        mainPictureImageView.layer.cornerRadius = 5.0
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

@@ -16,9 +16,13 @@ class MainPageViewController: UITableViewController {
     
     var globalContainerRestaurantsLoadedEventHandler: Disposable?
     
+    @IBOutlet weak var tableHeaderLabel: UILabel!
+    
     @IBOutlet var moreInfo: MoreInfoView!
     
     @IBOutlet var moreOption: MoreOptionView!
+    
+    let visualEffectView   = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
     
     @IBOutlet weak var navigationitem: UINavigationItem!
     
@@ -50,7 +54,7 @@ class MainPageViewController: UITableViewController {
             
             self.tableView?.reloadData()
             refresher.endRefreshing()
-            self.navigationItem.title = "\(filteredRestaurants.count) találat"
+            self.tableHeaderLabel.text = "\(filteredRestaurants.count) találat"
         }
     }
     
@@ -63,34 +67,35 @@ class MainPageViewController: UITableViewController {
         refresher.addTarget(self, action: #selector(refreshTableView), for: .valueChanged)
         
         searchBar.returnKeyType = .done
+        searchBar.setValue("✖️", forKey:"_cancelButtonText")
         
         moreInfoChangeStateEventHandler = moreInfo.didChangeStateEvent.addHandler(target: self, handler: switchMainViewAccessibility)
         
         globalContainerRestaurantsLoadedEventHandler = globalContainer.restaurantsLoadedEvent.addHandler(target: self, handler: populateTableView)
         
-        moreOption.setFrame(by: searchBar.frame)
+        setupMoreOptionView()
         
         tapGestureRecognizer.addTarget(self, action: #selector(closeMoreInfrmationView(_:)))
         edgeGestureRecognizer.addTarget(self, action: #selector(showMoreInformationView(_:)))
         
-        self.tableView.contentOffset = CGPoint(x: 0, y: searchBar.frame.height)
+        self.tableView.contentOffset.y = 0 - 100
         self.tableView.addSubview(refresher)
         
         self.view.addGestureRecognizer(edgeGestureRecognizer)
         
-        self.navigationController?.view.addSubview(moreInfo)
-        self.navigationController?.view.insertSubview(moreOption, at: 1)
-        self.navigationItem.rightBarButtonItem = showMoreOptionsBarButtonItem
+        setNavigationBar()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        self.navigationItem.title = "\(filteredRestaurants.count) találat"
+        self.tableHeaderLabel.text = "\(filteredRestaurants.count) találat"
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        self.navigationController?.navigationBar.sendSubview(toBack: visualEffectView)
         
         if globalContainer.restaurants.count != self.restaurants.count {
             
@@ -102,6 +107,25 @@ class MainPageViewController: UITableViewController {
         
         moreInfoChangeStateEventHandler?.dispose()
         globalContainerRestaurantsLoadedEventHandler?.dispose()
+    }
+    
+    private func setNavigationBar() {
+        
+        self.navigationItem.titleView = searchBar
+        self.navigationController?.view.addSubview(moreInfo)
+        self.navigationController?.view.insertSubview(moreOption, at: 2)
+        self.navigationItem.rightBarButtonItem = showMoreOptionsBarButtonItem
+        
+        visualEffectView.frame =  (self.navigationController?.navigationBar.bounds.insetBy(dx: 0, dy: -10).offsetBy(dx: 0, dy: -10))!
+        self.navigationController?.navigationBar.isTranslucent = true
+        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        self.navigationController?.navigationBar.shadowImage = UIImage()
+        self.navigationController?.navigationBar.insertSubview(visualEffectView, at: self.navigationController!.navigationBar.subviews.count)
+    }
+    
+    private func setupMoreOptionView() {
+        
+        moreOption.setFrame(by: CGRect(x: 0, y: 0 - moreOption.frame.height, width: self.view.frame.width, height: self.searchBar.frame.height))
     }
     
     private func setMoreInfoButtonAction(for button: UIButton, with identifier: String) {
@@ -178,13 +202,13 @@ class MainPageViewController: UITableViewController {
     
     @IBAction func moveMoreOptionView(_ sender: Any) {
         
-        if self.moreOption.frame.origin.y != 0 {
+        if self.moreOption.frame.origin.y < 0 {
             
-            closeMoreOptionView()
+            showMoreOptionView()
             
         } else {
             
-            showMoreOptionView()
+            closeMoreOptionView()
         }
     }
     
@@ -202,7 +226,7 @@ class MainPageViewController: UITableViewController {
         showMoreOptionsBarButtonItem.image = #imageLiteral(resourceName: "down-arrow-icon")
         
         UIView.animate(withDuration: 0.2) {
-            self.moreOption.frame.origin.y = 0
+            self.moreOption.frame.origin.y = 0 - self.moreOption.frame.height
         }
     }
     
@@ -221,6 +245,11 @@ class MainPageViewController: UITableViewController {
         case false:
             self.view.addGestureRecognizer(tapGestureRecognizer)
         }
+    }
+    
+    @objc private func showMap(_ sender: UILabel) {
+        
+        self.performSegue(withIdentifier: "showMap", sender: sender)
     }
     
     @objc private func showReservations() {
@@ -344,6 +373,7 @@ class MainPageViewController: UITableViewController {
                         if let restaurantViewController = segue.destination as? RestaurantViewController {
                             
                             restaurantViewController.restaurant = selectedRestaurant
+                            restaurantViewController.navigationItem.title = selectedRestaurant.Name
                         }
                     }
                 }

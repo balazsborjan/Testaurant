@@ -22,9 +22,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
         
         //UINavigationBar.appearance().barTintColor = UIColor(red: 0, green: 122, blue: 255)
-        UINavigationBar.appearance().barTintColor = UIColor.appDefault()
-        UINavigationBar.appearance().tintColor = UIColor.white
-        UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
+        UINavigationBar.appearance().barTintColor = UIColor.white //.appDefault()
+        UINavigationBar.appearance().tintColor = UIColor.darkGray
+        UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName: UIColor.darkGray]
+        
+        UIBarButtonItem.appearance()
+        //appearanceWhenContained(in: UINavigationBar.self, nil).setBackButtonBackgroundVerticalPositionAdjustment(-3, forBarMetrics: .default)
         
         return true
     }
