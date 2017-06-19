@@ -27,7 +27,7 @@ class RestaurantViewController: UIViewController {
     
     @IBOutlet weak var imageView: UIImageView!
     
-    @IBOutlet weak var scrollView: UIScrollView!
+    @IBOutlet weak var contentViewContainer: UIView!
     
     @IBOutlet weak var openingTimeLabel: UIButton!
     
@@ -43,7 +43,7 @@ class RestaurantViewController: UIViewController {
     
     @IBOutlet var tapGestureRecognizer: UITapGestureRecognizer!
     
-    @IBOutlet weak var reservationView: ReservationView!
+    @IBOutlet weak var scrollView: UIScrollView!
     
     @IBOutlet weak var peopleCountLabel: UILabel!
     
@@ -67,7 +67,7 @@ class RestaurantViewController: UIViewController {
     
     var pickerTapGestureRecognizer: UITapGestureRecognizer!
     
-    let navBarVisualEffectView   = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
+    var navBarVisualEffectView: UIVisualEffectView? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -75,9 +75,10 @@ class RestaurantViewController: UIViewController {
         globalContainer.ratingNetworkDelegate = self
         restaurant.galeryImageDelegate = self
         
+        setupPeopleCount()
         fetchRatings()
         setupImageView()
-        setupPeopleCount()
+        setupContentView()
         setupMapView()
         
         reservation = Reservation(restaurant: self.restaurant)
@@ -95,18 +96,11 @@ class RestaurantViewController: UIViewController {
         sendRservation.addTarget(self, action: #selector(sendReservation(_:)), for: .touchUpInside)
         tapGestureRecognizer.addTarget(self, action: #selector(viewTapped(_:)))
         
-        scrollView.contentSize.height = contentView.bounds.height
-        scrollView.contentSize.width = self.view.bounds.width
-        scrollView.contentMode = .scaleToFill
-        
-        contentView.frame.origin.x = scrollView.frame.origin.x
-        
-        scrollView.addSubview(contentView)
-        
-        navBarVisualEffectView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.navigationController!.navigationBar.frame.maxY)
+        navBarVisualEffectView = VisualEffectViewCreater.createVisualEffectView(
+            for: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.navigationController!.navigationBar.frame.maxY), with: .light)
         
         self.view.addGestureRecognizer(tapGestureRecognizer)
-        self.view.addSubview(navBarVisualEffectView)
+        self.view.addSubview(navBarVisualEffectView!)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -116,12 +110,6 @@ class RestaurantViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        self.view.bringSubview(toFront: navBarVisualEffectView)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -146,10 +134,27 @@ class RestaurantViewController: UIViewController {
         
         imageView.image = restaurant.image
         imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = 5.0
+        imageView.layer.cornerRadius = 10.0
+    }
+    
+    private func setupContentView() {
+        
+        let y = segmentControl.frame.maxY + 5
+        let height = self.view.frame.maxY - fullContentView.frame.minY - y
+        
+        contentView.frame = CGRect(x: 0, y: y, width: self.view.frame.width, height: height)
+        
+        scrollView.contentSize.height = 5000
+        
+        fullContentView.addSubview(contentView)
     }
     
     private func setupMapView() {
+        
+        mapView.clipsToBounds = true
+        mapView.layer.cornerRadius = 10.0
+        mapView.layer.borderColor = UIColor.darkGray.cgColor
+        mapView.layer.borderWidth = 0.2
         
         mapView.addAnnotation(restaurant)
         
@@ -189,18 +194,13 @@ class RestaurantViewController: UIViewController {
     
         resignTextFieldFirstResponder()
         
-        scrollView.contentOffset.y = 0
-        
         switch sender.selectedSegmentIndex {
         case 0:
-            contentView.bringSubview(toFront: reservationView)
-            scrollView.isUserInteractionEnabled = true
+            contentView.bringSubview(toFront: scrollView)
         case 1:
             contentView.bringSubview(toFront: galeryCollectionView)
-            scrollView.isUserInteractionEnabled = false
         case 2:
             contentView.bringSubview(toFront: ratingTableView)
-            scrollView.isUserInteractionEnabled = false
         default:
             break
         }
@@ -346,14 +346,14 @@ extension RestaurantViewController : UITextFieldDelegate {
             textField.inputView?.sendSubview(toBack: keyboardDatePicker)
             textField.inputView?.bringSubview(toFront: keyboardPicker)
             
-            self.peopleCountLabel.textColor = self.view.tintColor
+            self.peopleCountLabel.textColor = textField.tintColor
             
         } else if textField.isEqual(self.dateTextField) {
             
             textField.inputView?.sendSubview(toBack: keyboardPicker)
             textField.inputView?.bringSubview(toFront: keyboardDatePicker)
             
-            self.reservationDateLebel.textColor = self.view.tintColor
+            self.reservationDateLebel.textColor = textField.tintColor
         }
         
         return true
@@ -386,15 +386,8 @@ extension RestaurantViewController : UIPickerViewDataSource, UIPickerViewDelegat
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         
-        if reservation.selectedPeopleCount == peopleCount[row] {
-            
-            pickerView.endEditing(true)
-            
-        } else {
-            
-            reservation.selectedPeopleCount = peopleCount[row]
-            self.peopleCountLabel.text = String(describing: (row + 1))
-        }
+        reservation.selectedPeopleCount = peopleCount[row]
+        self.peopleCountLabel.text = String(describing: (row + 1))
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
@@ -531,11 +524,11 @@ extension RestaurantViewController {
         
         let keyboardRectTopY = self.view.frame.height - keyboardView.frame.height
         
-        let reservationButtonBottomY = self.fullContentView.frame.minY + sendRservation.frame.maxY + scrollView.frame.minY
+        let reservationButtonBottomY = self.fullContentView.frame.minY + sendRservation.frame.maxY + contentView.frame.minY
         
         if reservationButtonBottomY > keyboardRectTopY {
             
-            self.fullContentView.frame.origin.y = navigationController!.navigationBar.frame.maxY - segmentControl.frame.minY
+            self.fullContentView.frame.origin.y = navigationController!.navigationBar.frame.maxY - segmentControl.frame.minY + 3
         }
     }
     

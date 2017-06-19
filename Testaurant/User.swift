@@ -29,7 +29,7 @@ class User {
     
     private init() { }
     
-    func getReservations() {
+    func getReservations(completion: (() -> Void)?) {
         
         if let urlPath = GlobalMembers.reservationCRUD_URLs[ReservationCRUD.SelectByUserID] {
             
@@ -62,6 +62,11 @@ class User {
                                         self.reservations.append(newReservation)
                                     }
                                 }
+                            }
+                            
+                            DispatchQueue.main.async {
+                                
+                                completion?()   
                             }
                         }
                     }

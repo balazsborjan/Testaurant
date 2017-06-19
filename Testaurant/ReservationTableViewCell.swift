@@ -11,20 +11,18 @@ import UIKit
 class ReservationTableViewCell: UITableViewCell {
 
     @IBOutlet weak var restaurantNameLabel: UILabel!
-    
     @IBOutlet weak var selectedPeopleCountLabel: UILabel!
-    
     @IBOutlet weak var reservationDateLabel: UILabel!
-    
     @IBOutlet weak var restaurantImageView: UIImageView!
     
-    @IBOutlet weak var view: UIView!
+    
+    @IBOutlet weak var cardView: CardView!
     
     override func awakeFromNib() {
         super.awakeFromNib()
        
-        view.clipsToBounds = true
-        view.layer.cornerRadius = 5.0
+        restaurantImageView.clipsToBounds = true
+        restaurantImageView.layer.cornerRadius = 6.0
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

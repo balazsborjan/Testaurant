@@ -13,7 +13,7 @@ class MoreInfoView: UIView {
 
     let didChangeStateEvent = Event<Bool>()
     
-    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var visualEffectView: UIVisualEffectView!
     
     @IBOutlet weak var nameLabel: UILabel!
     
@@ -57,10 +57,6 @@ class MoreInfoView: UIView {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        
-        self.backgroundColor = UIColor.white
-        self.clipsToBounds = true
-        self.layer.borderWidth = 1
         
         let screenBounds = UIScreen.main.bounds
         let width = UIScreen.main.bounds.width / 5 * 4

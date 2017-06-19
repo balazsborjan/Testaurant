@@ -8,48 +8,62 @@
 
 import UIKit
 
-class ReservationsTableViewController: UITableViewController {
+class ReservationsTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
-    let activeReservations = User.instance.reservations.filter { $0.date >= Date() }
+    @IBOutlet weak var tableView: UITableView!
     
-    let pastReservations = User.instance.reservations.filter { $0.date < Date() }
+    var activeReservations: [Reservation] {
+        
+        get {
+            return User.instance.reservations.filter { $0.date >= Date() }
+        }
+    }
     
-    let tableViewSectionAndHeaderHeight: CGFloat = 50
+    var pastReservations: [Reservation] {
+        
+        get {
+            
+            return User.instance.reservations.filter { $0.date < Date() }
+        }
+    }
+    
+    var navBarVisualEffectView: UIVisualEffectView? = nil
+    
+    let refresher = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        self.navigationController?.navigationBar.isTranslucent = true
+        
+        navBarVisualEffectView = VisualEffectViewCreater.createVisualEffectView(
+            for: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.navigationController!.navigationBar.frame.maxY), with: .extraLight)
+        
+        self.view.addSubview(navBarVisualEffectView!)
+        
+        refresher.addTarget(self, action: #selector(refreshTableView), for: .valueChanged)
+        
+        self.tableView.addSubview(refresher)
+    }
+    
+    @objc private func refreshTableView() {
+        
+        User.instance.getReservations(completion: reservationsUpdated)
+    }
+    
+    private func reservationsUpdated() -> Void {
+        
+        self.tableView.reloadData()
     }
 
     // MARK: - Table view data source
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
+     func numberOfSections(in tableView: UITableView) -> Int {
         
-        if activeReservations.count == 0 && pastReservations.count == 0 {
-            
-            tableView.backgroundColor = UIColor.white
-            let view = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: self.tableViewSectionAndHeaderHeight))
-            
-            tableView.tableHeaderView = view
-            
-            let label = UILabel(frame: CGRect(x: 5, y: 0, width: view.frame.width - 5, height: view.frame.height))
-            
-            label.text = "Nincsenek foglalások"
-            
-            label.font = UIFont.systemFont(ofSize: 23)
-            
-            tableView.tableHeaderView!.addSubview(label)
-            
-            return 0
-        }
-        
-        tableView.tableHeaderView = nil
-        tableView.backgroundColor = UIColor.tableViewBackgroundDefault()
-        
-        return 2
+        return 1
     }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         switch section {
         case 0:
@@ -60,37 +74,8 @@ class ReservationsTableViewController: UITableViewController {
             return 0
         }
     }
-    
-    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        
-        let view = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: self.tableViewSectionAndHeaderHeight))
-        
-        view.backgroundColor = UIColor.white
-        
-        let label = UILabel(frame: CGRect(x: 5, y: 0, width: view.frame.width, height: view.frame.height))
-        
-        label.font = UIFont.systemFont(ofSize: 23)
-        
-        switch section {
-        case 0:
-            label.text = "Aktuális foglalások"
-        case 1:
-            label.text = "Korábbi foglalások"
-        default:
-            return nil
-        }
-        
-        view.addSubview(label)
-        
-        return view
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        
-        return self.tableViewSectionAndHeaderHeight
-    }
 
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         if let cell = tableView.dequeueReusableCell(withIdentifier: "reservationCell", for: indexPath) as? ReservationTableViewCell {
             

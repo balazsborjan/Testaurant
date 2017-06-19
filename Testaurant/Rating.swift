@@ -101,6 +101,10 @@ class Rating {
     
     private func getUserNameByUserID() -> Void {
         
+        if User.instance.userID == nil {
+            
+            
+        }
         
         let graphRequest = FBSDKGraphRequest(graphPath: User.instance.userID!, parameters: ["fields" : "id, name"], httpMethod: "GET")
         let connection = FBSDKGraphRequestConnection()

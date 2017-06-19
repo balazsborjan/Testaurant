@@ -52,7 +52,7 @@ class GlobalContainer {
             if error != nil {
                 
                 //ERRORHANDLING!!
-                print("infolekérés közben hiba")
+                self.setFBUserInfo()
                 
             } else {
                 
@@ -68,7 +68,6 @@ class GlobalContainer {
                 User.instance.profileImage = UIImage(data: NSData(contentsOf: url! as URL)! as Data)
                 
                 self.getUserReservations()
-                //print(User.instance.userID)
             }
         })
         connection.start()
@@ -76,7 +75,7 @@ class GlobalContainer {
     
     private func getUserReservations() {
         
-        User.instance.getReservations()
+        User.instance.getReservations(completion: nil)
     }
     
     private func fetchMainImages() {
@@ -143,6 +142,18 @@ class GlobalContainer {
         let status = CLLocationManager.authorizationStatus()
         
         return status == .notDetermined || status == .authorizedWhenInUse || status == .authorizedAlways
+    }
+}
+
+struct VisualEffectViewCreater {
+    
+    static func createVisualEffectView(for frame: CGRect, with style: UIBlurEffectStyle) -> UIVisualEffectView {
+        
+        let visualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: style))
+        
+        visualEffectView.frame = frame
+        
+        return visualEffectView
     }
 }
 
@@ -286,14 +297,7 @@ extension UIColor {
     
     static func appDefault() -> UIColor {
         
-        return UIColor(red: 62, green: 114, blue: 202)
-    }
-    
-    static func tableViewBackgroundDefault() -> UIColor {
-        
-        return UIColor(red: 186, green: 185, blue: 185).withAlphaComponent(0.95)
-        
-        
+        return UIColor(red: 251, green: 251, blue: 251)
     }
 }
 

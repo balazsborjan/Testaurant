@@ -15,6 +15,7 @@
 		0548CCDB1EEAD40800FE76B0 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0548CCDA1EEAD40800FE76B0 /* User.swift */; };
 		057C044C1ED481FA00E6253A /* Restaurant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057C044B1ED481FA00E6253A /* Restaurant.swift */; };
 		057C044F1ED484A100E6253A /* GlobalMembers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057C044E1ED484A100E6253A /* GlobalMembers.swift */; };
+		057E855C1EF7B47200D7A2B1 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 057E855B1EF7B47200D7A2B1 /* CardView.swift */; };
 		058FDA2F1EED374900D0D710 /* ReservationsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058FDA2E1EED374900D0D710 /* ReservationsTableViewController.swift */; };
 		058FDA311EED456700D0D710 /* ReservationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058FDA301EED456700D0D710 /* ReservationTableViewCell.swift */; };
 		05A52BBD1EBB0BF000DAF16A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A52BBC1EBB0BF000DAF16A /* AppDelegate.swift */; };
@@ -50,6 +51,7 @@
 		0548CCDA1EEAD40800FE76B0 /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		057C044B1ED481FA00E6253A /* Restaurant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Restaurant.swift; sourceTree = "<group>"; };
 		057C044E1ED484A100E6253A /* GlobalMembers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalMembers.swift; sourceTree = "<group>"; };
+		057E855B1EF7B47200D7A2B1 /* CardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		058FDA2E1EED374900D0D710 /* ReservationsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReservationsTableViewController.swift; sourceTree = "<group>"; };
 		058FDA301EED456700D0D710 /* ReservationTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReservationTableViewCell.swift; sourceTree = "<group>"; };
 		05A52BB91EBB0BF000DAF16A /* Testaurant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Testaurant.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -192,6 +194,7 @@
 				052D36381ED84E9F0086B1D5 /* MoreOptionView.swift */,
 				05C653D51EDECB6000EDD1E3 /* ReservationView.swift */,
 				0548CCD61EE936D700FE76B0 /* SelectedRestaurantView.swift */,
+				057E855B1EF7B47200D7A2B1 /* CardView.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -365,6 +368,7 @@
 				05C653D21EDECA6000EDD1E3 /* GaleryCollectionViewCell.swift in Sources */,
 				05C653D61EDECB6000EDD1E3 /* ReservationView.swift in Sources */,
 				05A52BBD1EBB0BF000DAF16A /* AppDelegate.swift in Sources */,
+				057E855C1EF7B47200D7A2B1 /* CardView.swift in Sources */,
 				05C653DA1EDEE5F100EDD1E3 /* Rating.swift in Sources */,
 				05C653D01EDEB16A00EDD1E3 /* RestaurantViewController.swift in Sources */,
 				05C653D41EDECA7700EDD1E3 /* RatingTableViewCell.swift in Sources */,
@@ -507,6 +511,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "Testaurant/Testaurant-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -527,6 +532,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Testaurant/Testaurant-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
