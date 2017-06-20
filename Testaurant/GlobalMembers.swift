@@ -25,6 +25,20 @@ class GlobalContainer {
     var restaurants: [Restaurant] = []
     var filteredRestaurants: [Restaurant] = []
     
+    var filterOptions: Array<(option: String, isSimple: Bool, isActive: Bool, selectedValue: String)> = [
+        
+        ("Város", false, false, ""),
+        ("Bankkártyás fizetés", true, false, ""),
+        ("Étkezési lehetőség", true, false, "")
+    ]
+    
+    let cities: [String] = [
+        
+        "Budapest",
+        "Szeged",
+        "Székesfehérvár"
+    ]
+    
     var ratings = Dictionary<Int, Array<Rating>>()
     
     let restaurantsLoadedEvent = Event<Void>()

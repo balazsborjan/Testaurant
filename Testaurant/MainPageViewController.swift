@@ -14,6 +14,8 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
     
     var moreInfoChangeStateEventHandler: Disposable?
     
+    var filterViewChangeStateEventHandler: Disposable?
+    
     var globalContainerRestaurantsLoadedEventHandler: Disposable?
     
     @IBOutlet var tableView: UITableView!
@@ -24,17 +26,21 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
     
     @IBOutlet var moreOption: MoreOptionView!
     
+    @IBOutlet var filterView: FilterView!
+    
     @IBOutlet weak var navigationitem: UINavigationItem!
     
     @IBOutlet weak var showMoreInfoBarButtonItem: UIBarButtonItem!
     
     @IBOutlet weak var showMoreOptionsBarButtonItem: UIBarButtonItem!
     
+    @IBOutlet weak var showMapBarButtonItem: UIBarButtonItem!
+    
     @IBOutlet weak var searchBar: UISearchBar!
     
-    @IBOutlet var tapGestureRecognizer: UITapGestureRecognizer!
-    
     @IBOutlet var edgeGestureRecognizer: UIScreenEdgePanGestureRecognizer!
+    
+    @IBOutlet var rightEdgeGestureRecognizer: UIScreenEdgePanGestureRecognizer!
     
     private var panGestureCenter: CGPoint?
     
@@ -68,17 +74,21 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
         
         moreInfoChangeStateEventHandler = moreInfo.didChangeStateEvent.addHandler(target: self, handler: switchMainViewAccessibility)
         
+        filterViewChangeStateEventHandler = filterView.didChangeStateEvent.addHandler(target: self, handler: switchMainViewAccessibility)
+        
         globalContainerRestaurantsLoadedEventHandler = globalContainer.restaurantsLoadedEvent.addHandler(target: self, handler: populateTableView)
         
-        tapGestureRecognizer.addTarget(self, action: #selector(closeMoreInfrmationView(_:)))
-        edgeGestureRecognizer.addTarget(self, action: #selector(showMoreInfoView(_:)))
+        edgeGestureRecognizer.addTarget(self, action: #selector(showMoreInfoView))
+        rightEdgeGestureRecognizer.addTarget(self, action: #selector(showFilterView))
         
         self.tableView.addSubview(refresher)
         
         self.view.addGestureRecognizer(edgeGestureRecognizer)
+        self.view.addGestureRecognizer(rightEdgeGestureRecognizer)
         
         setupMoreOptionView()
         setNavigationBar()
+        filterView.setFilterTableViewFrame(toNavBarRect: self.navigationController!.navigationBar.frame)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -106,8 +116,22 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
         
         self.navigationItem.titleView = searchBar
         self.navigationController?.view.addSubview(moreInfo)
-        self.navigationController?.view.insertSubview(moreOption, at: 2)
+        self.navigationController?.view.addSubview(filterView)
+        //self.navigationController?.view.insertSubview(moreOption, at: 3)
         self.navigationItem.rightBarButtonItem = showMoreOptionsBarButtonItem
+        self.navigationItem.backBarButtonItem = nil
+        self.navigationItem.hidesBackButton = true
+        self.navigationItem.setHidesBackButton(true, animated: false)
+        
+        showMoreInfoBarButtonItem.target = self
+        showMoreInfoBarButtonItem.action = #selector(showMoreInfoView)
+        
+        showMoreOptionsBarButtonItem.target = self
+        showMoreOptionsBarButtonItem.action = #selector(showFilterView)
+        
+        showMapBarButtonItem.target = self
+        showMapBarButtonItem.action = #selector(showFilterView)
+        
         
         self.navBarVisualEffectView = VisualEffectViewCreater.createVisualEffectView(for: CGRect(
             x: 0,
@@ -129,11 +153,6 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
     private func populateTableView() {
         
         self.restaurants = globalContainer.restaurants
-    }
-    
-    @IBAction func showMoreInformationView(_ sender: UIBarButtonItem) {
-        
-        showMoreInfoView(sender)
     }
     
     @objc private func refreshTableView() {
@@ -183,44 +202,45 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
     
     // MARK: Open/Close Settings view
     
-    @objc private func showMoreInfoView(_ sender: Any?) {
+    @objc fileprivate func showMoreInfoView() {
         
-        moreInfo.show()
+        self.filterView.hide(completion: nil)
+        self.moreInfo.show()
     }
     
-    @objc private func closeMoreInfrmationView(_ sender: Any?) {
+    private func closeExtraViews() {
         
         moreInfo.hide(completion: nil)
+        filterView.hide(completion: nil)
     }
     
-    @IBAction func moveMoreOptionView(_ sender: Any) {
+    @objc fileprivate func showFilterView() {
         
-        if self.moreOption.frame.origin.y < 0 {
-            
-            showMoreOptionView()
-            
-        } else {
-            
-            closeMoreOptionView()
-        }
+        self.moreInfo.hide(completion: nil)
+        self.filterView.show()
     }
     
-    func showMoreOptionView() {
-    
-        showMoreOptionsBarButtonItem.image = #imageLiteral(resourceName: "up-arrow-icon")
+    @objc fileprivate func showRestaurantsOnMap() {
         
-        UIView.animate(withDuration: 0.2) {
-            self.moreOption.frame.origin.y = (self.navigationController?.navigationBar.frame.maxY)!
-        }
-        
-        UIView.animate(withDuration: 0.25, animations: {
-            self.navBarVisualEffectView?.frame.origin.y = 0
-        })
+        self.performSegue(withIdentifier: "showMap", sender: self)
     }
+    
+//    @objc fileprivate func showMoreOptionView() {
+//    
+//        //showMoreOptionsBarButtonItem.image = #imageLiteral(resourceName: "up-arrow-icon")
+//        
+//        UIView.animate(withDuration: 0.2) {
+//            self.moreOption.frame.origin.y = (self.navigationController?.navigationBar.frame.maxY)!
+//        }
+//        
+//        UIView.animate(withDuration: 0.25, animations: {
+//            self.navBarVisualEffectView?.frame.origin.y = 0
+//        })
+//    }
     
     private func closeMoreOptionView() {
         
-        showMoreOptionsBarButtonItem.image = #imageLiteral(resourceName: "down-arrow-icon")
+        //showMoreOptionsBarButtonItem.image = #imageLiteral(resourceName: "down-arrow-icon")
         
         UIView.animate(withDuration: 0.2) {
             self.moreOption.frame.origin.y = 0 - self.moreOption.frame.height
@@ -233,19 +253,17 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
     
     private func switchMainViewAccessibility(to isEnabled: Bool) {
         
-        showMoreOptionsBarButtonItem.isEnabled = isEnabled
+        var enabled = isEnabled
         
-        searchBar.isUserInteractionEnabled = isEnabled
-        
-        tableView.isScrollEnabled = isEnabled
-        tableView.allowsSelection = isEnabled
-        
-        switch isEnabled {
-        case true:
-            self.view.gestureRecognizers = self.view.gestureRecognizers?.filter { $0 !== tapGestureRecognizer }
-        case false:
-            self.view.addGestureRecognizer(tapGestureRecognizer)
+        if moreInfo.frame.maxX > 0 || filterView.frame.origin.x < self.view.frame.maxX {
+            
+            enabled = false
         }
+        
+        searchBar.isUserInteractionEnabled = enabled
+        
+        tableView.isScrollEnabled = enabled
+        tableView.allowsSelection = enabled
     }
     
     // MARK: TableView
@@ -257,7 +275,7 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return tableView == self.tableView ? filteredRestaurants.count : 5
+        return tableView == self.tableView ? filteredRestaurants.count : globalContainer.filterOptions.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -292,23 +310,57 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
             return cell
         }
         
+        let currentOption = globalContainer.filterOptions[indexPath.row]
+        
+        if currentOption.isSimple {
+            
+            if let cell = tableView.dequeueReusableCell(withIdentifier: "filterSwitchCell") as? FilterSwitchTableViewCell {
+                
+                cell.optionLabel.text = currentOption.option
+                cell.optionSwitch.isOn = currentOption.isActive
+                
+                return cell
+            }
+            
+        } else {
+            
+            if let cell = tableView.dequeueReusableCell(withIdentifier: "filterMultiCell") as? FilterMultiTableViewCell {
+                
+                cell.optionLabel.text = currentOption.option
+                cell.selectedValueLabel.text = currentOption.selectedValue
+                
+                return cell
+            }
+        }
+        
         return UITableViewCell()
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        searchBar.resignFirstResponder()
-        
-        if let cell = tableView.cellForRow(at: indexPath) as? MainPageTableViewCell {
+        if tableView.isEqual(self.tableView) {
             
-            self.performSegue(withIdentifier: "openRestaurant", sender: cell)
+            searchBar.resignFirstResponder()
+            
+            if let cell = tableView.cellForRow(at: indexPath) as? MainPageTableViewCell {
+                
+                self.performSegue(withIdentifier: "openRestaurant", sender: cell)
+            }
+            
+        } else {
+            
+            if let cell = tableView.cellForRow(at: indexPath) as? FilterMultiTableViewCell {
+                
+                globalContainer.filterOptions[indexPath.row].selectedValue = "Szeged"
+                cell.selectedValueLabel.text = "Szeged"
+            }
         }
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
         searchBar.resignFirstResponder()
-        closeMoreOptionView()
+        closeMoreOptionView()        
     }
     
     func filterRestaurants(by filterText: String?) {
@@ -325,7 +377,7 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
-        closeMoreInfrmationView(nil)
+        closeExtraViews()
         closeMoreOptionView()
         
         self.navigationItem.title = ""
@@ -363,12 +415,38 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
 
 extension MainPageViewController : UISearchBarDelegate {
     
+    func maximizeSearchBar() {
+        
+        self.navigationItem.setLeftBarButton(nil, animated: true)
+        self.navigationItem.setRightBarButtonItems(nil, animated: true)
+    }
+    
+    func minimizeSearchBar() {
+        
+        self.navigationItem.setLeftBarButton(
+            UIBarButtonItem(image: #imageLiteral(resourceName: "menu-icon"), style: .plain, target: self, action: #selector(showMoreInfoView)),
+            animated: true
+        )
+        
+        self.navigationItem.setRightBarButtonItems(
+            [
+                UIBarButtonItem(image: #imageLiteral(resourceName: "settings-icon"), style: .plain, target: self, action: #selector(showFilterView)),
+                UIBarButtonItem(image: #imageLiteral(resourceName: "navigation-icon"), style: .plain, target: self, action: #selector(showRestaurantsOnMap))
+            ],
+            animated: true
+        )
+    }
+    
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        
+        maximizeSearchBar()
         
         searchBar.showsCancelButton = true
     }
     
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        
+        minimizeSearchBar()
         
         searchBar.showsCancelButton = false
     }

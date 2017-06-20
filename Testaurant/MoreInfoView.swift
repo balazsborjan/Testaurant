@@ -17,13 +17,7 @@ class MoreInfoView: UIView {
     
     @IBOutlet weak var nameLabel: UILabel!
     
-    @IBOutlet weak var headerView: UIView! {
-        
-        didSet {
-            
-            self.layer.borderColor = headerView.backgroundColor?.cgColor
-        }
-    }
+    @IBOutlet weak var headerView: UIView!
     
     @IBOutlet weak var profileImageView: UIImageView! {
         

@@ -39,6 +39,9 @@
 		05C653D81EDEE2AE00EDD1E3 /* Reservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C653D71EDEE2AE00EDD1E3 /* Reservation.swift */; };
 		05C653DA1EDEE5F100EDD1E3 /* Rating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C653D91EDEE5F100EDD1E3 /* Rating.swift */; };
 		05C653E01EE1E5E800EDD1E3 /* NetworkDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C653DF1EE1E5E800EDD1E3 /* NetworkDelegate.swift */; };
+		05CC6B421EF9058B00B1F54E /* FilterSwitchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CC6B411EF9058B00B1F54E /* FilterSwitchTableViewCell.swift */; };
+		05CC6B441EF9059B00B1F54E /* FilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CC6B431EF9059B00B1F54E /* FilterView.swift */; };
+		05CC6B461EF9156D00B1F54E /* FilterMultiTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CC6B451EF9156D00B1F54E /* FilterMultiTableViewCell.swift */; };
 		95467A67FED53E1BDDD79F7D /* Pods_Testaurant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E04018B07AF0EEA0BD5FE0F /* Pods_Testaurant.framework */; };
 /* End PBXBuildFile section */
 
@@ -79,6 +82,9 @@
 		05C653DF1EE1E5E800EDD1E3 /* NetworkDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkDelegate.swift; sourceTree = "<group>"; };
 		05C7D5831EEBB75300AAC647 /* UserLocationGPX.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = UserLocationGPX.gpx; sourceTree = "<group>"; };
 		05C7D5841EEBD31D00AAC647 /* Testaurant-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Testaurant-Bridging-Header.h"; sourceTree = "<group>"; };
+		05CC6B411EF9058B00B1F54E /* FilterSwitchTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterSwitchTableViewCell.swift; sourceTree = "<group>"; };
+		05CC6B431EF9059B00B1F54E /* FilterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterView.swift; sourceTree = "<group>"; };
+		05CC6B451EF9156D00B1F54E /* FilterMultiTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterMultiTableViewCell.swift; sourceTree = "<group>"; };
 		8E04018B07AF0EEA0BD5FE0F /* Pods_Testaurant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Testaurant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		95099F78E8310F42062FB114 /* Pods-Testaurant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testaurant.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Testaurant/Pods-Testaurant.debug.xcconfig"; sourceTree = "<group>"; };
 		E524BFEA2FD3E6998F8B97D2 /* Pods-Testaurant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testaurant.release.xcconfig"; path = "Pods/Target Support Files/Pods-Testaurant/Pods-Testaurant.release.xcconfig"; sourceTree = "<group>"; };
@@ -195,6 +201,7 @@
 				05C653D51EDECB6000EDD1E3 /* ReservationView.swift */,
 				0548CCD61EE936D700FE76B0 /* SelectedRestaurantView.swift */,
 				057E855B1EF7B47200D7A2B1 /* CardView.swift */,
+				05CC6B431EF9059B00B1F54E /* FilterView.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -206,6 +213,8 @@
 				05C653D11EDECA6000EDD1E3 /* GaleryCollectionViewCell.swift */,
 				05C653D31EDECA7700EDD1E3 /* RatingTableViewCell.swift */,
 				058FDA301EED456700D0D710 /* ReservationTableViewCell.swift */,
+				05CC6B411EF9058B00B1F54E /* FilterSwitchTableViewCell.swift */,
+				05CC6B451EF9156D00B1F54E /* FilterMultiTableViewCell.swift */,
 			);
 			name = Cells;
 			sourceTree = "<group>";
@@ -358,6 +367,7 @@
 				05C653E01EE1E5E800EDD1E3 /* NetworkDelegate.swift in Sources */,
 				0548CCD71EE936D700FE76B0 /* SelectedRestaurantView.swift in Sources */,
 				05A52BEE1EBB19A900DAF16A /* MainPageViewController.swift in Sources */,
+				05CC6B441EF9059B00B1F54E /* FilterView.swift in Sources */,
 				05A52BBF1EBB0BF000DAF16A /* LoginViewController.swift in Sources */,
 				0548CCD91EE9A66E00FE76B0 /* MapViewController.swift in Sources */,
 				0548CCDB1EEAD40800FE76B0 /* User.swift in Sources */,
@@ -371,6 +381,8 @@
 				057E855C1EF7B47200D7A2B1 /* CardView.swift in Sources */,
 				05C653DA1EDEE5F100EDD1E3 /* Rating.swift in Sources */,
 				05C653D01EDEB16A00EDD1E3 /* RestaurantViewController.swift in Sources */,
+				05CC6B421EF9058B00B1F54E /* FilterSwitchTableViewCell.swift in Sources */,
+				05CC6B461EF9156D00B1F54E /* FilterMultiTableViewCell.swift in Sources */,
 				05C653D41EDECA7700EDD1E3 /* RatingTableViewCell.swift in Sources */,
 				05A52BC51EBB0BF000DAF16A /* Testaurant.xcdatamodeld in Sources */,
 			);
