@@ -11,11 +11,12 @@ import FBSDKLoginKit
 
 let fbManager = FBSDKLoginManager()
 
-class LoginViewController: UIViewController {
-
+class LoginViewController: UIViewController
+{
     let loginButton = FBSDKLoginButton()
     
-    override func viewDidLoad() {
+    override func viewDidLoad()
+    {
         super.viewDidLoad()
         
         loginButton.center = view.center
@@ -26,42 +27,48 @@ class LoginViewController: UIViewController {
         self.view.addSubview(loginButton)
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewWillAppear(_ animated: Bool)
+    {
         super.viewWillAppear(animated)
         
         setupNavigationItem()
     }
     
-    private func setupNavigationItem() {
-        
+    private func setupNavigationItem()
+    {
         self.navigationItem.hidesBackButton = true
         self.navigationItem.setHidesBackButton(true, animated: false)
     }
     
-    func presentMainViewController() {
-
-        if let viewController = storyboard?.instantiateViewController(withIdentifier: "mainViewController") {
-            
+    func presentMainViewController()
+    {
+        if let viewController = storyboard?.instantiateViewController(withIdentifier: "mainViewController")
+        {
             self.navigationController?.pushViewController(viewController, animated: true)
         }
     }
 }
 
-extension LoginViewController : FBSDKLoginButtonDelegate {
-    
-    func loginButton(_ loginButton: FBSDKLoginButton!, didCompleteWith result: FBSDKLoginManagerLoginResult!, error: Error!) {
-        
-        if error != nil {
+extension LoginViewController : FBSDKLoginButtonDelegate
+{
+    func loginButton(_ loginButton: FBSDKLoginButton!, didCompleteWith result: FBSDKLoginManagerLoginResult!, error: Error!)
+    {
+        if error != nil
+        {
             print("error")
-        } else if result.isCancelled {
+        }
+        else if result.isCancelled
+        {
             print("cancelled")
-        } else {
+        }
+        else
+        {
             self.presentMainViewController()
         }
     }
     
-    func loginButtonDidLogOut(_ loginButton: FBSDKLoginButton!) {
-        
+    func loginButtonDidLogOut(_ loginButton: FBSDKLoginButton!)
+    {
         self.navigationItem.title = "Logged out!"
     }
 }

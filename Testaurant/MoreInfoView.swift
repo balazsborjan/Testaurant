@@ -8,10 +8,11 @@
 
 import UIKit
 import FBSDKLoginKit
+import TestaurantBL
 
 class MoreInfoView: UIView {
 
-    let didChangeStateEvent = Event<Bool>()
+//    let didChangeStateEvent = Event<Bool>()
     
     @IBOutlet weak var visualEffectView: UIVisualEffectView!
     
@@ -49,7 +50,8 @@ class MoreInfoView: UIView {
         
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder)
+    {
         super.init(coder: aDecoder)
         
         let screenBounds = UIScreen.main.bounds
@@ -69,14 +71,14 @@ class MoreInfoView: UIView {
     
     func show() {
         
-        if self.profilePicture == nil {
-            
-            self.profilePicture = User.instance.profileImage
+        if self.profilePicture == nil
+        {
+            self.profilePicture = UserService.Instance.profileImage
         }
         
-        if self.nameLabel.text != User.instance.name {
-            
-            self.nameLabel.text = User.instance.name
+        if self.nameLabel.text != UserService.Instance.name
+        {
+            self.nameLabel.text = UserService.Instance.name
         }
         
         self.superview?.bringSubview(toFront: self)
@@ -84,21 +86,17 @@ class MoreInfoView: UIView {
         UIView.animate(withDuration: 0.3, animations: {
             self.frame.origin.x = 0
         })
-        
-        didChangeStateEvent.raise(data: false)
     }
     
-    func hide(completion: ((Bool) -> Void)?) {
-        
+    func hide(completion: ((Bool) -> Void)?)
+    {
         UIView.animate(withDuration: 0.3, animations: {
             self.frame.origin.x = 0 - self.frame.width
         }, completion: completion)
-        
-        didChangeStateEvent.raise(data: true)
     }
     
-    @objc private func closeOnSwipe(_ sender: UISwipeGestureRecognizer) {
-        
+    @objc private func closeOnSwipe(_ sender: UISwipeGestureRecognizer)
+    {
         self.hide(completion: nil)
     }
 }

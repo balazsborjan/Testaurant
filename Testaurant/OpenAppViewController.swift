@@ -8,125 +8,67 @@
 
 import UIKit
 import FBSDKLoginKit
+import MapKit
 
-class OpenAppViewController: UIViewController {
-
-    override func awakeFromNib() {
+class OpenAppViewController: UIViewController
+{
+    override func awakeFromNib()
+    {
         super.awakeFromNib()
         
         self.navigationController?.navigationBar.isTranslucent = false
     }
     
-    override func viewDidLoad() {
+    override func viewDidLoad()
+    {
         super.viewDidLoad()
         
-        globalContainer.locationManager.requestWhenInUseAuthorization()
+        let locationManager = CLLocationManager()
+        locationManager.requestWhenInUseAuthorization()
         
-        globalContainer.networkDelegate = self
-        
-        if (FBSDKAccessToken.current() == nil) {
-            
+        if (FBSDKAccessToken.current() == nil)
+        {
             navigateToLoginViewController()
-            
-        } else {
-            
-            fetchRestaurants()
+        }
+        else
+        {
+            navigateToMainPageViewController()
         }
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewWillAppear(_ animated: Bool)
+    {
         super.viewWillAppear(animated)
         
         self.navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool)
+    {
         super.viewWillDisappear(animated)
         
         self.navigationController?.setNavigationBarHidden(false, animated: true)
     }
     
-    private func fetchRestaurants() {
+    fileprivate func showNetworkAlert()
+    {
         
-        DispatchQueue.global().async {
-            
-            globalContainer.fetchRestaurants()
-        }
     }
     
-    fileprivate func showNetworkAlert() {
-        
-        let alert = UIAlertController(
-            title: "Kapcsolódási hiba",
-            message: "Kérjük ellenőrizze internetkapcsolatát",
-            preferredStyle: .alert)
-        
-        alert.addAction(UIAlertAction(title: "Rendben", style: .default, handler: { (action) in
-            
-            self.fetchRestaurants()
-        }))
-        
-        alert.addAction(UIAlertAction(title: "Mégsem", style: .cancel, handler: { (action) in
-            
-            self.navigateToLoginViewController()
-        }))
-        
-        self.present(alert, animated: true, completion: nil)
-    }
-    
-    fileprivate func navigateToLoginViewController() {
-        
-        if let viewController = storyboard?.instantiateViewController(withIdentifier: "loginVC") {
-            
-            fetchRestaurants()
-            
+    fileprivate func navigateToLoginViewController()
+    {
+        if let viewController = storyboard?.instantiateViewController(withIdentifier: "loginVC")
+        {
             self.navigationController?.pushViewController(viewController, animated: true)
         }
     }
     
-    fileprivate func navigateToMain() {
-        
-        if let viewController = storyboard?.instantiateViewController(withIdentifier: "mainViewController") {
-            
+    fileprivate func navigateToMainPageViewController()
+    {
+        if let viewController = storyboard?.instantiateViewController(withIdentifier: "mainViewController")
+        {
             self.navigationController?.pushViewController(viewController, animated: true)
         }
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
-        if segue.identifier != nil {
-            
-            if segue.identifier == "openMainVC" {
-                
-                if let destination = segue.destination as? UINavigationController {
-                 
-                    destination.visibleViewController?.navigationItem.title = "\(globalContainer.restaurants.count) találat"
-                }
-            }
-        }
-    }
-}
-
-extension OpenAppViewController : NetworkDelegate {
-    
-    func restaurantRequestFinished(successed: Bool) {
-        
-        if successed {
-            
-            if self.navigationController?.visibleViewController == self {
-                
-                self.navigateToMain()
-            }
-            
-        } else {
-            
-            self.showNetworkAlert()
-        }
-    }
-    
-    func restaurantImageRequestFinished(seccessed: Bool) {
-        
-        
     }
 }
 

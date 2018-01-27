@@ -9,18 +9,22 @@
 import UIKit
 import MapKit
 import CoreLocation
+import TestaurantBL
 
-class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate {
-
+class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate
+{
     @IBOutlet weak var mapView: MKMapView!
     
-    var restaurants = [Restaurant]()
+    let locationManager = CLLocationManager()
+    
+    var restaurants = Array<RestaurantDto>()
     
     var mapViewFinishedLoading = false
     
     let navBarVisualEffectView   = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
     
-    override func viewDidLoad() {
+    override func viewDidLoad()
+    {
         super.viewDidLoad()
         
         navBarVisualEffectView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.navigationController!.navigationBar.frame.maxY)
@@ -34,73 +38,76 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         mapView.showsUserLocation = true
         mapView.addAnnotations(restaurants)
         
-        globalContainer.locationManager.delegate = self
-        globalContainer.locationManager.desiredAccuracy = kCLLocationAccuracyKilometer
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyKilometer
         
-        if CLLocationManager.locationServicesEnabled() {
-            
-            if globalContainer.isLocationAuthorizationEnabled() {
-                
-                globalContainer.locationManager.startUpdatingLocation()
-                
-            } else {
-                
-                globalContainer.locationManager.requestWhenInUseAuthorization()
+        if CLLocationManager.locationServicesEnabled()
+        {
+            if IsLocationAuthorizationEnabled()
+            {
+                locationManager.startUpdatingLocation()
+            }
+            else
+            {
+                locationManager.requestWhenInUseAuthorization()
             }
         }
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool)
+    {
         super.viewWillDisappear(animated)
         
-        globalContainer.locationManager.stopUpdatingLocation()
+        locationManager.stopUpdatingLocation()
     }
     
-    private func showAnnotations() {
-        
-        mapView.addAnnotation(mapView.userLocation)
-        mapView.showAnnotations(mapView.annotations, animated: true)
+    private func IsLocationAuthorizationEnabled() -> Bool
+    {
+        let status = CLLocationManager.authorizationStatus()
+        return status == .notDetermined || status == .authorizedWhenInUse || status == .authorizedAlways
+    }
+    
+    private func showAnnotations()
+    {
+        mapView.showAnnotations(mapView.annotations.filter { !$0.isEqual(mapView.userLocation) }, animated: true)
         mapViewFinishedLoading = true
     }
     
     // MARK: LocationManager delegate methods
-    
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
+    {
         print(error.localizedDescription)
     }
     
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        
-        if status == .notDetermined || status == .authorizedWhenInUse || status == .authorizedAlways {
-            
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus)
+    {
+        if status == .notDetermined || status == .authorizedWhenInUse || status == .authorizedAlways
+        {
             manager.startUpdatingLocation()
-            
-        } else {
-            
+        }
+        else
+        {
             manager.stopUpdatingLocation()
         }
     }
     
     // MARK: MapView delegate methods
-    
-    func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
-        
-        if !mapViewFinishedLoading {
-         
+    func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation)
+    {
+        if !mapViewFinishedLoading
+        {
             showAnnotations()
         }
     }
     
-    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView)
+    {
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(showOpenInMapAlert(_:)))
-        
         view.addGestureRecognizer(tapGestureRecognizer)
     }
     
-    @objc private func showOpenInMapAlert(_ sender: UITapGestureRecognizer) {
-        
+    @objc private func showOpenInMapAlert(_ sender: UITapGestureRecognizer)
+    {
         let alertController = UIAlertController(title: "Navigáció", message: nil, preferredStyle: .actionSheet)
         
         alertController.addAction(UIAlertAction(title: "Maps", style: .default, handler: { (action) in
@@ -121,10 +128,10 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         self.present(alertController, animated: true, completion: nil)
     }
     
-    private func openInMaps(for annotationView: MKAnnotationView) {
-        
-        if let annotation = annotationView.annotation {
-            
+    private func openInMaps(for annotationView: MKAnnotationView)
+    {
+        if let annotation = annotationView.annotation
+        {
             let placeMark = MKPlacemark(coordinate: annotation.coordinate)
             let mapItem = MKMapItem(placemark: placeMark)
             
@@ -132,18 +139,21 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         }
     }
     
-    private func openInGoogleMaps(for annotationView: MKAnnotationView) {
-        
+    private func openInGoogleMaps(for annotationView: MKAnnotationView)
+    {
         if let annotation = annotationView.annotation {
             
             let latitude = annotation.coordinate.latitude
             let longitude = annotation.coordinate.longitude
             
-            if (UIApplication.shared.canOpenURL(URL(string:"comgooglemaps://")!)) {
+            if (UIApplication.shared.canOpenURL(URL(string:"comgooglemaps://")!))
+            {
                 UIApplication.shared.open(
                     URL(string: "comgooglemaps://?saddr=&daddr=\(latitude),\(longitude)&directionsmode=transit")!,
                     options: [:], completionHandler: nil)
-            } else {
+            }
+            else
+            {
                 UIApplication.shared.open(
                     URL(string: "https://www.google.com/maps/search/?api=1&query=\(latitude),\(longitude)")!,
                         options: [:], completionHandler: nil)

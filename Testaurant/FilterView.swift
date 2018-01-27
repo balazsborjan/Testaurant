@@ -7,18 +7,18 @@
 //
 
 import UIKit
+import TestaurantBL
 
-class FilterView: UIView {
-
+class FilterView: UIView
+{
     @IBOutlet weak var tableView: UITableView!
     
     @IBOutlet weak var headerView: UIView!
     
-    let didChangeStateEvent = Event<Bool>()
-    
     private var swipeGestureRecognizer: UISwipeGestureRecognizer?
     
-    override init(frame: CGRect) {
+    override init(frame: CGRect)
+    {
         super.init(frame: frame)
     }
     
@@ -50,8 +50,6 @@ class FilterView: UIView {
         UIView.animate(withDuration: 0.3, animations: {
             self.frame.origin.x = UIScreen.main.bounds.width / 5
         })
-        
-        didChangeStateEvent.raise(data: false)
     }
     
     func hide(completion: ((Bool) -> Void)?) {
@@ -59,12 +57,10 @@ class FilterView: UIView {
         UIView.animate(withDuration: 0.3, animations: {
             self.frame.origin.x = UIScreen.main.bounds.maxX
         }, completion: completion)
-        
-        didChangeStateEvent.raise(data: true)
     }
     
-    @objc private func closeOnSwipe(_ sender: UISwipeGestureRecognizer) {
-        
+    @objc private func closeOnSwipe(_ sender: UISwipeGestureRecognizer)
+    {
         self.hide(completion: nil)
     }
 }

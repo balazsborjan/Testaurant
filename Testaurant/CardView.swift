@@ -15,6 +15,8 @@ class CardView: UIView {
     override func awakeFromNib() {
         super.awakeFromNib()
         
+        self.clipsToBounds = false
+        self.layer.cornerRadius = 10.0
     }
     
     override func layoutSubviews() {
@@ -22,9 +24,11 @@ class CardView: UIView {
         
         if shadowLayer == nil {
             shadowLayer = CAShapeLayer()
-            shadowLayer.path = UIBezierPath(roundedRect: bounds, cornerRadius: 10).cgPath
-            shadowLayer.fillColor = UIColor.white.cgColor
             
+            let rect = CGRect(x: bounds.minX - 1, y: bounds.minY - 1, width: bounds.width + 2, height: bounds.height + 2)
+            
+            shadowLayer.path = UIBezierPath(roundedRect: rect, cornerRadius: 10).cgPath
+            shadowLayer.fillColor = UIColor.white.cgColor
             shadowLayer.shadowColor = UIColor.darkGray.cgColor
             shadowLayer.shadowPath = shadowLayer.path
             shadowLayer.shadowOffset = CGSize(width: 2.0, height: 2.0)
