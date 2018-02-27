@@ -14,8 +14,6 @@ class ReservationTableViewCell: UITableViewCell {
     @IBOutlet weak var selectedPeopleCountLabel: UILabel!
     @IBOutlet weak var reservationDateLabel: UILabel!
     @IBOutlet weak var restaurantImageView: UIImageView!
-    
-    
     @IBOutlet weak var cardView: CardView!
     
     override func awakeFromNib() {

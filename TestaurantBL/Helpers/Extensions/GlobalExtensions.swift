@@ -14,9 +14,80 @@ public struct VisualEffectViewCreater
     public static func CreateVisualEffectView(for frame: CGRect, with style: UIBlurEffectStyle) -> UIVisualEffectView
     {
         let visualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: style))
-        visualEffectView.frame = frame
+        visualEffectView.frame = CGRect(x: frame.minX, y: frame.minY, width: frame.width, height: frame.height + UIApplication.shared.statusBarFrame.height)
         
         return visualEffectView
+    }
+}
+
+extension UIImageView
+{
+    public func roundCornersForAspectFit(radius: CGFloat)
+    {
+        if let image = self.image
+        {
+            //calculate drawingRect
+            let boundsScale = self.bounds.size.width / self.bounds.size.height
+            let imageScale = image.size.width / image.size.height
+            
+            var drawingRect : CGRect = self.bounds
+            
+            if boundsScale > imageScale
+            {
+                drawingRect.size.width =  drawingRect.size.height * imageScale
+                drawingRect.origin.x = (self.bounds.size.width - drawingRect.size.width) / 2
+            }
+            else
+            {
+                drawingRect.size.height = drawingRect.size.width / imageScale
+                drawingRect.origin.y = (self.bounds.size.height - drawingRect.size.height) / 2
+            }
+            let path = UIBezierPath(roundedRect: drawingRect, cornerRadius: radius)
+            let mask = CAShapeLayer()
+            mask.path = path.cgPath
+            self.layer.mask = mask
+        }
+    }
+}
+
+extension UILabel
+{
+    public func setLabelAttributes(text: String, image: UIImage)
+    {
+        let imageAttachment =  NSTextAttachment()
+        imageAttachment.image = image
+        //Set bound to reposition
+        imageAttachment.bounds = CGRect(x: 0, y: -(self.frame.maxY / 8), width: self.frame.height / 2, height: self.frame.height / 2)
+        //Create string with attachment
+        let attachmentString = NSAttributedString(attachment: imageAttachment)
+        //Initialize mutable string
+        let completeText = NSMutableAttributedString(string: "")
+        //Add your text to mutable string
+        let  textAfterIcon = NSAttributedString(string: "  \(text)")
+        completeText.append(textAfterIcon)
+        completeText.insert(attachmentString, at: 0)
+        self.attributedText = completeText;
+    }
+}
+
+extension UIResponder
+{
+    func next<T: UIResponder>(_ type: T.Type) -> T?
+    {
+        return next as? T ?? next?.next(type)
+    }
+}
+
+extension UITableViewCell
+{
+    public var tableView: UITableView?
+    {
+        return next(UITableView.self)
+    }
+    
+    public var indexPath: IndexPath?
+    {
+        return tableView?.indexPath(for: self)
     }
 }
 

@@ -9,26 +9,26 @@
 import UIKit
 import Foundation
 import TestaurantBL
+import PreviewTransition
+import NVActivityIndicatorView
+import UIImageColors
 
-class MainPageViewController: UIViewController, UITableViewDelegate, UITableViewDataSource
+class MainPageViewController: UIViewController, UITableViewDelegate, UITableViewDataSource //PTTableViewController
 {
+    // Network session
+    var expectedContentLength = 0
+    var buffer:NSMutableData = NSMutableData()
+    // ##############
+    
     @IBOutlet var tableView: UITableView!
     
-    @IBOutlet weak var tableHeaderLabel: UILabel!
+    let searchController = UISearchController(searchResultsController: nil)
     
-    @IBOutlet var moreInfo: MoreInfoView!
+    var showMoreInfoBarButtonItem: UIBarButtonItem!
     
-    @IBOutlet var filterView: FilterView!
+    var showMoreOptionsBarButtonItem: UIBarButtonItem!
     
-    @IBOutlet weak var navigationitem: UINavigationItem!
-    
-    @IBOutlet weak var showMoreInfoBarButtonItem: UIBarButtonItem!
-    
-    @IBOutlet weak var showMoreOptionsBarButtonItem: UIBarButtonItem!
-    
-    @IBOutlet weak var showMapBarButtonItem: UIBarButtonItem!
-    
-    @IBOutlet weak var searchBar: UISearchBar!
+    var showMapBarButtonItem: UIBarButtonItem!
     
     @IBOutlet var edgeGestureRecognizer: UIScreenEdgePanGestureRecognizer!
     
@@ -40,7 +40,7 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
     
     private let refresher = UIRefreshControl()
     
-    private var restaurants = DBService.Instance.GetRestaurants()
+    private var restaurants = Array<RestaurantDto>()
     {
         didSet
         {
@@ -54,134 +54,122 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
         {
             self.tableView?.reloadData()
             refresher.endRefreshing()
-            self.tableHeaderLabel.text = "\(filteredRestaurants.count) találat"
         }
     }
     
-    var navBarVisualEffectView: UIVisualEffectView? = nil
-    
+    let sideMenuManager = SideMenuManager()
+
     override func viewDidLoad()
     {
         super.viewDidLoad()
         
-        refresher.addTarget(self, action: #selector(refreshTableView), for: .valueChanged)
+        sideMenuManager.delegate = self
         
-        searchBar.returnKeyType = .done
-        searchBar.setValue("✖️", forKey:"_cancelButtonText")
+        setNavigationBar()
+//        setupTableViewBackgroundView()
+        
+        refresher.addTarget(self, action: #selector(refreshTableView), for: .valueChanged)
+        self.tableView.refreshControl = refresher
         
         edgeGestureRecognizer.addTarget(self, action: #selector(showMoreInfoView))
         rightEdgeGestureRecognizer.addTarget(self, action: #selector(showFilterView))
         
-        self.tableView.addSubview(refresher)
-        
         self.view.addGestureRecognizer(edgeGestureRecognizer)
         self.view.addGestureRecognizer(rightEdgeGestureRecognizer)
         
-        setNavigationBar()
-        filterView.setFilterTableViewFrame(toNavBarRect: self.navigationController!.navigationBar.frame)
+        fetchRestaurants()
     }
     
     override func viewWillAppear(_ animated: Bool)
     {
         super.viewWillAppear(animated)
         
-        self.tableHeaderLabel.text = "\(filteredRestaurants.count) találat"
+        self.navigationItem.title = "Helyszínek"
+    }
+    
+    override func viewWillDisappear(_ animated: Bool)
+    {
+        super.viewWillDisappear(animated)
+        
+        self.navigationItem.title = ""
     }
     
     private func setNavigationBar()
     {
-        self.navigationItem.titleView = searchBar
-        self.navigationController?.view.addSubview(moreInfo)
-        self.navigationController?.view.addSubview(filterView)
-        self.navigationItem.rightBarButtonItem = showMoreOptionsBarButtonItem
-        self.navigationItem.backBarButtonItem = nil
+        self.showMoreInfoBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "left-menu-icon"), style: .done, target: self, action: #selector(showMoreInfoView))
+        self.showMapBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "map-icon"), style: .done, target: self, action: #selector(showRestaurantsOnMap))
+        self.showMoreOptionsBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "settings-icon-new-new"), style: .done, target: self, action: #selector(showFilterView))
+        
         self.navigationItem.hidesBackButton = true
         self.navigationItem.setHidesBackButton(true, animated: false)
+        self.navigationItem.backBarButtonItem = nil
         
-        self.imageInsets = showMapBarButtonItem.imageInsets
+        self.navigationItem.leftBarButtonItem = showMoreInfoBarButtonItem
+        self.navigationItem.rightBarButtonItems = [showMoreOptionsBarButtonItem, showMapBarButtonItem]
         
-        showMoreInfoBarButtonItem.target = self
-        showMoreInfoBarButtonItem.action = #selector(showMoreInfoView)
+        UISearchBar.appearance().tintColor = UIColor.darkText
         
-        showMoreOptionsBarButtonItem.target = self
-        showMoreOptionsBarButtonItem.action = #selector(showFilterView)
+        searchController.searchResultsUpdater = self
+        searchController.dimsBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Helyszín keresése"
+        searchController.searchBar.searchBarStyle = .minimal
+        searchController.searchBar.keyboardAppearance = UIKeyboardAppearance.dark
+        searchController.searchBar.delegate = self
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
+        definesPresentationContext = true
+    }
+    
+    private func setupTableViewBackgroundView()
+    {
+        let bgView = UIView(frame: self.view.frame)
+        let imageView = UIImageView(frame: bgView.frame)
+        let veView = UIVisualEffectView(frame: imageView.frame)
+        let veView2 = UIVisualEffectView(frame: imageView.frame)
         
-        showMapBarButtonItem.target = self
-        showMapBarButtonItem.action = #selector(showRestaurantsOnMap)
+//        bgView.backgroundColor = UIColor.blue
         
+//        imageView.image = #imageLiteral(resourceName: "background")
+        imageView.contentMode = .scaleAspectFill
         
-        self.navBarVisualEffectView = VisualEffectViewCreater.CreateVisualEffectView(for: CGRect(
-            x: 0,
-            y: 0 - self.searchBar.frame.height,
-            width: self.view.frame.width,
-            height: ((self.navigationController?.navigationBar.frame.maxY)! + self.searchBar.frame.height)), with: .extraLight)
+        veView.effect = UIBlurEffect(style: .dark)
+        veView.alpha = 0.5
         
-        self.view.addSubview(navBarVisualEffectView!)
+        veView2.effect = UIBlurEffect(style: .light)
         
+        imageView.addSubview(veView2)
+        imageView.addSubview(veView)
+        bgView.addSubview(imageView)
+        
+        self.tableView.backgroundView = bgView
+    }
+    
+    private func fetchRestaurants()
+    {
+        NVActivityIndicatorPresenter.sharedInstance.setMessage("Helyszínek betöltése")
+        NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
+        
+        DBService.Instance.GetRestaurants { (result) in
+            self.restaurants = result
+            NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
+        }
     }
     
     // MARK: Fetch restaurant data (by search)
     @objc private func refreshTableView()
     {
-        self.restaurants = DBService.Instance.GetRestaurants()
-    }
-    
-    @IBAction func showReservations(_ sender: UIButton)
-    {
-        self.performSegue(withIdentifier: "showReservations", sender: self)
-    }
-    
-    // MARK: Login/Logout handling
-    @IBAction func logout(_ sender: UIButton)
-    {
-        // MARK: Figyelmeztetés
-        let alert = UIAlertController(title: "Biztosan kijelentkezik?", message: nil, preferredStyle: .alert)
-        
-        alert.addAction(UIAlertAction(title: "Kijelentkezés", style: .destructive, handler: { (action) in
-            self.doLogout()
-        }))
-        
-        alert.addAction(UIAlertAction(title: "Mégsem", style: .default, handler: { (action) in
-            // Do nothing
-        }))
-        
-        self.present(alert, animated: true, completion: nil)
-    }
-    
-    private func doLogout()
-    {
-        fbManager.logOut()
-        moreInfo.hide(completion: showLoginViewController)
-    }
-    
-    func showLoginViewController(logoutSuccessed successed: Bool) -> Void
-    {
-        if successed
-        {
-            if let viewController = storyboard?.instantiateViewController(withIdentifier: "loginVC")
-            {
-                self.navigationController?.pushViewController(viewController, animated: true)
-            }
-        }
+        fetchRestaurants()
     }
     
     // MARK: Open/Close Settings view
-    @objc fileprivate func showMoreInfoView()
+    @objc fileprivate func showMoreInfoView(sender: Any)
     {
-        self.filterView.hide(completion: nil)
-        self.moreInfo.show()
-    }
-    
-    private func closeExtraViews()
-    {
-        moreInfo.hide(completion: nil)
-        filterView.hide(completion: nil)
+        sideMenuManager.showMoreOptionView()        
     }
     
     @objc fileprivate func showFilterView()
     {
-        self.moreInfo.hide(completion: nil)
-        self.filterView.show()
+        sideMenuManager.showFilterView()
     }
     
     @objc fileprivate func showRestaurantsOnMap()
@@ -189,23 +177,7 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
         self.performSegue(withIdentifier: "showMap", sender: self)
     }
     
-    private func switchMainViewAccessibility(to isEnabled: Bool)
-    {
-        var enabled = isEnabled
-        
-        if moreInfo.frame.maxX > 0 || filterView.frame.origin.x < self.view.frame.maxX
-        {
-            enabled = false
-        }
-        
-        searchBar.isUserInteractionEnabled = enabled
-        
-        tableView.isScrollEnabled = enabled
-        tableView.allowsSelection = enabled
-    }
-    
     // MARK: TableView
-    
     func numberOfSections(in tableView: UITableView) -> Int
     {
         return 1
@@ -214,52 +186,36 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int
     {
         return filteredRestaurants.count
-//        return tableView == self.tableView ? filteredRestaurants.count : globalContainer.filterOptions.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
     {
         if let cell = tableView.dequeueReusableCell(withIdentifier: "searchRestaurantCell")
         {
-            cell.backgroundColor = tableView.backgroundColor
-            
             if let restaurantCell = cell as? MainPageTableViewCell
             {
                 let currentRestaurant = filteredRestaurants[indexPath.row]
-                
-                restaurantCell.nameLabel?.text = currentRestaurant.Name
-                restaurantCell.avarageRatingLabel?.text = "4,4"
-                restaurantCell.mainPictureImageView.sd_setImage(with: DBService.Instance.GetMainImageUrl(for: currentRestaurant), placeholderImage: nil)
+
+                restaurantCell.nameTextView.text = currentRestaurant.Name
+                restaurantCell.avarageRatingLabel.setLabelAttributes(text: "\(currentRestaurant.AvgRating)", image: #imageLiteral(resourceName: "rating-icon"))
+                restaurantCell.freeSpaceLabel.setLabelAttributes(text: "\(currentRestaurant.FreeSpace)", image: #imageLiteral(resourceName: "free-table-icon"))
+
+                restaurantCell.mainPictureImageView.sd_setShowActivityIndicatorView(true)
+
+                restaurantCell.mainPictureImageView.sd_setImage(with: DBService.Instance.GetMainImageUrl(for: currentRestaurant), completed: { (image, error, imageCachedType, url) in
+//                    restaurantCell.backgroundImageView.image = image
+                    
+//                    image?.getColors({ (colors) in
+//                        restaurantCell.shadowColor = colors.primary
+//                    })
+                    
+                    DBService.Instance.Restaurants.filter{ $0.ID == currentRestaurant.ID }.first?.MainImage.image = image
+                })
             }
-            
-            cell.selectionStyle = .none
-            
+
             return cell
         }
-        
-//        let currentOption = globalContainer.filterOptions[indexPath.row]
-//
-//        if currentOption.isSimple
-//        {
-//            if let cell = tableView.dequeueReusableCell(withIdentifier: "filterSwitchCell") as? FilterSwitchTableViewCell
-//            {
-//                cell.optionLabel.text = currentOption.option
-//                cell.optionSwitch.isOn = currentOption.isActive
-//
-//                return cell
-//            }
-//        }
-//        else
-//        {
-//            if let cell = tableView.dequeueReusableCell(withIdentifier: "filterMultiCell") as? FilterMultiTableViewCell
-//            {
-//                cell.optionLabel.text = currentOption.option
-//                cell.selectedValueLabel.text = currentOption.selectedValue
-//
-//                return cell
-//            }
-//        }
-        
+
         return UITableViewCell()
     }
     
@@ -267,18 +223,11 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
     {
         if tableView.isEqual(self.tableView)
         {
-            searchBar.resignFirstResponder()
-            
             if let cell = tableView.cellForRow(at: indexPath) as? MainPageTableViewCell
             {
-                self.performSegue(withIdentifier: "openRestaurant", sender: cell)
+                self.performSegue(withIdentifier: "proba", sender: cell)
             }
         }
-    }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView)
-    {
-        searchBar.resignFirstResponder()
     }
     
     func filterRestaurants(by filterText: String?)
@@ -295,21 +244,24 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?)
     {
-        closeExtraViews()
-        
-        self.navigationItem.title = ""
-        
         if let identifier = segue.identifier
         {
             if let cell = sender as? MainPageTableViewCell
             {
-                if identifier == "openRestaurant"
+                if let indexPath = self.tableView.indexPath(for: cell)
                 {
-                    if let indexPath = self.tableView.indexPath(for: cell)
+                    let selectedRestaurant = filteredRestaurants[indexPath.row]
+                    
+                    if identifier == "proba"
                     {
-                        let selectedRestaurant = filteredRestaurants[indexPath.row]
-                        
-                        if let restaurantViewController = segue.destination as? RestaurantViewController
+                        if let destVC = segue.destination as? ProbaViewController
+                        {
+                            destVC.restaurant = selectedRestaurant
+                        }
+                    }
+                    else if identifier == "openRestaurant"
+                    {
+                        if let restaurantViewController = segue.destination as? SelectedRestaurantViewController//RestaurantViewController
                         {
                             restaurantViewController.restaurant = selectedRestaurant
                         }
@@ -330,67 +282,168 @@ class MainPageViewController: UIViewController, UITableViewDelegate, UITableView
     }
 }
 
-extension MainPageViewController : UISearchBarDelegate {
-    
-    func maximizeSearchBar() {
+extension MainPageViewController : UISearchResultsUpdating
+{
+    func updateSearchResults(for searchController: UISearchController)
+    {
+        if searchController.searchBar.text == nil || searchController.searchBar.text == ""
+        {
+            self.filterRestaurants(by: "")
+        }
+        else
+        {
+            self.filterRestaurants(by: searchController.searchBar.text)
+        }
+    }
+}
+
+extension MainPageViewController : SideMenuDelegate
+{
+    func showFavourites()
+    {
         
-        self.navigationItem.setLeftBarButton(nil, animated: true)
-        self.navigationItem.setRightBarButtonItems(nil, animated: true)
     }
     
-    func minimizeSearchBar() {
+    func showAboutUs()
+    {
         
-        self.navigationItem.setLeftBarButton(
-            UIBarButtonItem(image: #imageLiteral(resourceName: "user-icon"), style: .plain, target: self, action: #selector(showMoreInfoView)),
-            animated: true
-        )
-        
-        self.navigationItem.setRightBarButtonItems(
-            [
-                UIBarButtonItem(image: #imageLiteral(resourceName: "settings-icon-new-new"), style: .plain, target: self, action: #selector(showFilterView)),
-                UIBarButtonItem(image: #imageLiteral(resourceName: "map-icon"), style: .plain, target: self, action: #selector(showRestaurantsOnMap))
-            ],
-            animated: true
-        )
-        
-        self.navigationItem.rightBarButtonItems![1].imageInsets = self.imageInsets!
     }
     
-    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+    func showRateThisApp()
+    {
         
-        maximizeSearchBar()
+    }
+    
+    func showProfile()
+    {
         
+    }
+    
+    func showSettings()
+    {
+        
+    }
+    
+    func showReservations()
+    {
+        self.performSegue(withIdentifier: "showReservations", sender: self)
+    }
+    
+    func logout()
+    {
+        // MARK: Figyelmeztetés
+        let alert = UIAlertController(title: "Biztosan kijelentkezik?", message: nil, preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "Kijelentkezés", style: .destructive, handler: { (action) in
+            self.doLogout()
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Mégsem", style: .default, handler: { (action) in
+            // Do nothing
+        }))
+        
+        DispatchQueue.main.async {
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    fileprivate func doLogout()
+    {
+        UserService.Instance.logout {
+            fbManager.logOut()
+            if let viewcontroller = storyboard?.instantiateViewController(withIdentifier: "loginVC")
+            {
+                self.present(viewcontroller, animated: true, completion: nil)
+            }
+        }
+    }
+}
+
+extension MainPageViewController : UISearchBarDelegate
+{
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar)
+    {
         searchBar.showsCancelButton = true
     }
-    
-    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        
-        minimizeSearchBar()
-        
+
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar)
+    {
         searchBar.showsCancelButton = false
     }
-    
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        
+
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String)
+    {
         self.filterRestaurants(by: searchText)
     }
-    
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        
+
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar)
+    {
         self.filterRestaurants(by: "")
         searchBar.text = ""
         searchBar.endEditing(true)
     }
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        
+
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar)
+    {
         searchBar.resignFirstResponder()
     }
-    
-    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-        
-        tableView.setContentOffset(tableView.contentOffset, animated: false)
-        
-        return true
-    }
 }
+
+//extension MainPageViewController : URLSessionDownloadDelegate
+//{
+//    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64)
+//    {
+//        let percentage = CGFloat(totalBytesWritten) / CGFloat(totalBytesExpectedToWrite)
+//
+//        print(percentage)
+//
+//        DispatchQueue.main.async {
+//            self.progressBar.shapeLayer.strokeEnd = percentage
+//        }
+//    }
+//}
+
+//extension MainPageViewController : URLSessionDataDelegate
+//{
+//    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?)
+//    {
+//        if error == nil
+//        {
+//
+//        }
+//    }
+//
+//    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data)
+//    {
+//        buffer.append(data)
+//        let percentageDownloaded = CGFloat(buffer.length) / CGFloat(expectedContentLength)
+//        self.progressBar.shapeLayer.strokeEnd = percentageDownloaded
+//    }
+//
+//    @nonobjc func URLSession(session: URLSession, dataTask: URLSessionDataTask, didReceiveResponse response: URLResponse, completionHandler: (URLSession.ResponseDisposition) -> Void)
+//    {
+//        expectedContentLength = Int(response.expectedContentLength)
+//        print(expectedContentLength)
+////        completionHandler(URLSession.ResponseDisposition.Allow)
+//    }
+//
+//    func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession)
+//    {
+//        self.progressBar.shapeLayer.strokeEnd = 1.0
+//    }
+//}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

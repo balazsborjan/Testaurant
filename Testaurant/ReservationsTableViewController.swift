@@ -14,6 +14,13 @@ class ReservationsTableViewController: UIViewController, UITableViewDelegate, UI
     @IBOutlet weak var tableView: UITableView!
     
     var allReservations = Array<ReservationDto>()
+    {
+        didSet
+        {
+            self.tableView.reloadData()
+            refresher.endRefreshing()
+        }
+    }
     
     var activeReservations: Array<ReservationDto>
     {
@@ -39,22 +46,27 @@ class ReservationsTableViewController: UIViewController, UITableViewDelegate, UI
     {
         super.viewDidLoad()
 
-        self.navigationController?.navigationBar.isTranslucent = true
-        
-        navBarVisualEffectView = VisualEffectViewCreater.CreateVisualEffectView(
-            for: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.navigationController!.navigationBar.frame.maxY), with: .extraLight)
-        
-        self.view.addSubview(navBarVisualEffectView!)
-        
         refresher.addTarget(self, action: #selector(refreshTableView), for: .valueChanged)
         
         self.tableView.addSubview(refresher)
+        
+        DBService.Instance.GetReservations { (result) in
+            self.allReservations = result
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool)
+    {
+        super.viewWillAppear(animated)
+        
+        self.navigationItem.title = "Foglalásaim"
     }
     
     @objc private func refreshTableView()
     {
-        self.allReservations = DBService.Instance.GetReservations()
-        self.tableView.reloadData()
+        DBService.Instance.GetReservations { (result) in
+            self.allReservations = result
+        }
     }
 
     // MARK: - Table view data source
@@ -63,18 +75,30 @@ class ReservationsTableViewController: UIViewController, UITableViewDelegate, UI
      {
         return 1
     }
+    
+//    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView?
+//    {
+//        let titleLabel = UILabel()
+//        titleLabel.font = UIFont.systemFont(ofSize: CGFloat(25))
+//        titleLabel.font = UIFont.systemFont(ofSize: CGFloat(25), weight: UIFont.Weight.semibold)
+//        titleLabel.backgroundColor = self.tableView.backgroundColor
+//
+//        switch section
+//        {
+//        case 0:
+//            titleLabel.text = "  Aktív foglalások"
+//        case 1:
+//            titleLabel.text = "  Korábbi foglalások"
+//        default:
+//            titleLabel.text = nil
+//        }
+//
+//        return titleLabel
+//    }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int
     {
-        switch section
-        {
-            case 0:
-                return activeReservations.count
-            case 1:
-                return pastReservations.count
-            default:
-                return 0
-        }
+        return allReservations.count
     }
 
      func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
@@ -83,20 +107,24 @@ class ReservationsTableViewController: UIViewController, UITableViewDelegate, UI
         {
             var currentReservation: ReservationDto!
             
-            switch indexPath.section
-            {
-                case 0:
-                    currentReservation = activeReservations[indexPath.row]
-                case 1:
-                    currentReservation = pastReservations[indexPath.row]
-                default:
-                    break
-            }
+            currentReservation = allReservations[indexPath.row]
+            
+//            switch indexPath.section
+//            {
+//                case 0:
+//                    currentReservation = activeReservations[indexPath.row]
+//                case 1:
+//                    currentReservation = pastReservations[indexPath.row]
+//                default:
+//                    break
+//            }
             
             cell.restaurantNameLabel.text = DBService.Instance.Restaurants.filter{ $0.ID! == currentReservation.RestaurantID }.first?.Name
             cell.selectedPeopleCountLabel.text = String(describing: currentReservation.SelectedPeopleCount!)
             cell.reservationDateLabel.text = currentReservation.ReservationDate.toFullFormatString(withYear: true, withLongFormatMonth: true)
-            cell.restaurantImageView.image = DBService.Instance.Restaurants.filter{ $0.ID! == currentReservation.RestaurantID }.first?.MainImage
+            cell.restaurantImageView.image = DBService.Instance.Restaurants.filter{ $0.ID! == currentReservation.RestaurantID }.first?.MainImage.image
+            
+            cell.selectionStyle = .none
             
             return cell
         }

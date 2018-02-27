@@ -11,19 +11,27 @@ import Foundation
 public class OpeningHoursDto : NSObject
 {
     var ID: Int!
-    var restaurantID: Int!
+    var RestaurantID: Int!
     
-    var Monday: String!
-    var Tuesday: String!
-    var Wednesday: String!
-    var Thursday: String!
-    var Friday: String!
-    var Saturday: String!
-    var Sunday: String!
+    public var Monday: String!
+    public var Tuesday: String!
+    public var Wednesday: String!
+    public var Thursday: String!
+    public var Friday: String!
+    public var Saturday: String!
+    public var Sunday: String!
     
-    override init()
+    init(restaurantId: Int, monday: String, tuesday: String, wednesday: String, thursday: String, friday: String, saturday: String, sunday: String)
     {
-        super.init()
+        ID = 0
+        RestaurantID = restaurantId
+        Monday = monday
+        Tuesday = tuesday
+        Wednesday = wednesday
+        Thursday = thursday
+        Friday = friday
+        Saturday = saturday
+        Sunday = sunday
     }
     
     init?(json: [String: AnyObject])
@@ -45,7 +53,7 @@ public class OpeningHoursDto : NSObject
         }
         
         self.ID = id
-        self.restaurantID = rID
+        self.RestaurantID = rID
         self.Monday = m
         self.Tuesday = tu
         self.Wednesday = w

@@ -20,18 +20,20 @@ public class DBService
     public var Restaurants = Array<RestaurantDto>()
     
     // MARK: DB url-ek definiálása
-    private let serviceURL: String = "http://wcf.testaurant.dropthecheeseofficial.com:1993/Services/TestaurantDBService.svc/"
-    private let mainImageByRestaurantIdFuncName: String = "GetMainImageById/%d"
+    private let serviceURL: String = "http://wcf.testaurant.dropthecheeseofficial.com:1993/Services/DBService.svc/"
+    private let mainImageByRestaurantIdFuncName: String = "GetImageByID/%d"
     
     // MARK: DB FUNCTIONS
-    public func GetRestaurants() -> Array<RestaurantDto>
+    public func GetRestaurants(completion: @escaping (_: Array<RestaurantDto>) -> Void) // sessionDelegate: URLSessionDelegate, 
     {
-        let serviceFuncName = "GetAllEtterem"
+        let serviceFuncName = "GetAllRestaurant"
         var restaurants = Array<RestaurantDto>()
         
         if let url = URL(string: serviceURL + serviceFuncName)
         {
-            let session = URLSession.shared
+//            let sessionConfiguration = URLSessionConfiguration.default
+//            let operationQueue = OperationQueue.main
+            let session = URLSession.shared // configuration: sessionConfiguration, delegate: sessionDelegate, delegateQueue: operationQueue
             
             session.dataTask(with: url, completionHandler: { (data, response, error) in
                 
@@ -57,31 +59,33 @@ public class DBService
                                 }
                             }
                         }
+                        
+                        DispatchQueue.main.async {
+                            self.Restaurants = restaurants
+                            completion(restaurants)
+                        }                        
                     }
                 }
-                
             }).resume()
         }
-        
-        self.Restaurants = restaurants
-        return restaurants
     }
     
     public func GetMainImageUrl(for restaurant: RestaurantDto) -> URL?
     {
-        let urlPath = serviceURL + mainImageByRestaurantIdFuncName
+        let urlParameters = String(format: mainImageByRestaurantIdFuncName, restaurant.ID)
+        let urlPath = serviceURL + urlParameters
         
         if restaurant.ID != nil
         {
-            return URL(fileURLWithPath:  String(format: urlPath, restaurant.ID!))
+            return URL(string: String(format: urlPath, restaurant.ID!))
         }
         
         return nil
     }
     
-    public func GetReservations() -> Array<ReservationDto>
+    public func GetReservations(completion: @escaping (Array<ReservationDto>) -> Void)
     {
-        let getReservationsFuncName = "GetReservationsByUserId/%@"
+        let getReservationsFuncName = "GetReservationsByUserID/%@"
         
         let urlParameters = String(format: getReservationsFuncName, UserService.Instance.userID!)
         
@@ -114,16 +118,20 @@ public class DBService
                                 }
                             }
                         }
+                        
+                        DispatchQueue.main.async {
+                            completion(reservations)
+                        }
                     }
                 }
             }).resume()
         }
-        
-        return reservations
     }
     
-    public func Send(reservation: ReservationDto) -> Bool
+    public func Send(reservation: ReservationDto, completion: @escaping (Bool) -> Void)
     {
+        
+        
         let sendReservationFuncName = "InsertReservation"
         
         var result = false
@@ -133,7 +141,8 @@ public class DBService
             if let json = try? JSONSerialization.data(withJSONObject: reservation.toJSON(), options: .prettyPrinted)
             {
                 let request = NSMutableURLRequest(url: url)
-                request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                request.httpMethod = "POST"
+                request.addValue("Application/json", forHTTPHeaderField: "Content-Type")
                 request.httpBody = json
                 
                 let session = URLSession.shared
@@ -153,13 +162,15 @@ public class DBService
                         }
                     }
                     
+                    DispatchQueue.main.async {
+                        completion(result)
+                    }
+                    
                     print(response as Any)
                     
                 }).resume()
             }
         }
-        
-        return result
     }
     
     public func GetRatingsBy(restaurant: RestaurantDto) -> Array<RatingDto>

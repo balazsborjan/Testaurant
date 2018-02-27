@@ -17,10 +17,7 @@ public class UserService
     // MARK: Singleton példányosítás
     public static let Instance = UserService()
     
-    private init()
-    {
-        self.setFBUserInfo()
-    }
+    private init() { }
     
     // MARK: Global properties
     public var userID: String?
@@ -31,7 +28,7 @@ public class UserService
     public var profileImage: UIImage?
     
     // MARK: FUNCTIONS
-    private func setFBUserInfo()
+    public func setFBUserInfo(completion: @escaping () -> Void)
     {        
         let graphRequest = FBSDKGraphRequest(graphPath: "me", parameters: ["fields" : "id, name, first_name, last_name, email"])
         let connection = FBSDKGraphRequestConnection()
@@ -56,8 +53,23 @@ public class UserService
                 
                 let url = NSURL(string: "https://graph.facebook.com/\(self.userID!)/picture?type=large&return_ssl_resources=1")
                 self.profileImage = UIImage(data: NSData(contentsOf: url! as URL)! as Data)
+                
+                DispatchQueue.main.async {
+                    completion()
+                }
             }
         })
         connection.start()
+    }
+    
+    public func logout(completion: () -> Void)
+    {
+        self.email = nil
+        self.firstName = nil
+        self.lastName = nil
+        self.profileImage = nil
+        self.userID = nil
+        self.name = nil
+        completion()
     }
 }

@@ -8,6 +8,8 @@
 
 import UIKit
 import FBSDKLoginKit
+import TestaurantBL
+import NVActivityIndicatorView
 
 let fbManager = FBSDKLoginManager()
 
@@ -24,27 +26,16 @@ class LoginViewController: UIViewController
         
         loginButton.delegate = self
         
-        self.view.addSubview(loginButton)
-    }
-    
-    override func viewWillAppear(_ animated: Bool)
-    {
-        super.viewWillAppear(animated)
+        loginButton.isHidden = false
         
-        setupNavigationItem()
-    }
-    
-    private func setupNavigationItem()
-    {
-        self.navigationItem.hidesBackButton = true
-        self.navigationItem.setHidesBackButton(true, animated: false)
+        self.view.addSubview(loginButton)
     }
     
     func presentMainViewController()
     {
-        if let viewController = storyboard?.instantiateViewController(withIdentifier: "mainViewController")
+        if let viewController = storyboard?.instantiateViewController(withIdentifier: "startViewController")
         {
-            self.navigationController?.pushViewController(viewController, animated: true)
+            self.present(viewController, animated: true, completion: nil)
         }
     }
 }
@@ -53,17 +44,25 @@ extension LoginViewController : FBSDKLoginButtonDelegate
 {
     func loginButton(_ loginButton: FBSDKLoginButton!, didCompleteWith result: FBSDKLoginManagerLoginResult!, error: Error!)
     {
+        loginButton.isHidden = true
+        NVActivityIndicatorPresenter.sharedInstance.setMessage("Bejelentkezés")
+        NVActivityIndicatorPresenter.sharedInstance.startAnimating(activityData)
+        
         if error != nil
         {
             print("error")
+            NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
         }
         else if result.isCancelled
         {
             print("cancelled")
+            NVActivityIndicatorPresenter.sharedInstance.stopAnimating()
         }
         else
         {
-            self.presentMainViewController()
+            UserService.Instance.setFBUserInfo {
+                self.presentMainViewController()
+            }
         }
     }
     

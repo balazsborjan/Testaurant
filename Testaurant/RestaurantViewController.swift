@@ -79,8 +79,6 @@ class RestaurantViewController: UIViewController
     
     var pickerTapGestureRecognizer: UITapGestureRecognizer!
     
-    var navBarVisualEffectView: UIVisualEffectView? = nil
-    
     override func viewDidLoad()
     {
         super.viewDidLoad()
@@ -106,11 +104,7 @@ class RestaurantViewController: UIViewController
         sendRservation.addTarget(self, action: #selector(sendReservation(_:)), for: .touchUpInside)
         tapGestureRecognizer.addTarget(self, action: #selector(viewTapped(_:)))
         
-        navBarVisualEffectView = VisualEffectViewCreater.CreateVisualEffectView(
-            for: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.navigationController!.navigationBar.frame.maxY), with: .light)
-        
         self.view.addGestureRecognizer(tapGestureRecognizer)
-        self.view.addSubview(navBarVisualEffectView!)
     }
     
     override func viewWillAppear(_ animated: Bool)
@@ -144,7 +138,7 @@ class RestaurantViewController: UIViewController
     
     private func setupImageView()
     {
-        imageView.image = restaurant.MainImage
+        imageView.image = restaurant.MainImage.image
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 10.0
     }
@@ -251,7 +245,7 @@ class RestaurantViewController: UIViewController
         
         alert.addAction(UIAlertAction(title: "Küldés", style: .default, handler: { (action) in
             
-            self.sendReservationResult = DBService.Instance.Send(reservation: self.reservation)
+//            self.sendReservationResult = DBService.Instance.Send(reservation: self.reservation)
         }))
         
         alert.addAction(UIAlertAction(title: "Mégsem", style: .destructive, handler: { (action) in
@@ -489,7 +483,7 @@ extension RestaurantViewController : UIGestureRecognizerDelegate
 
 extension RestaurantViewController
 {
-    func keyboardWillShow(notification: NSNotification)
+    @objc func keyboardWillShow(notification: NSNotification)
     {
         scrollView.contentOffset.y = 0
         
@@ -503,7 +497,7 @@ extension RestaurantViewController
         }
     }
     
-    func keyboardWillHide(notification: NSNotification)
+    @objc func keyboardWillHide(notification: NSNotification)
     {
         self.fullContentView.frame.origin.y = navigationController!.navigationBar.frame.maxY
     }

@@ -23,12 +23,17 @@ public class RestaurantDto : NSObject, MKAnnotation
     public var Name: String!
     public var MaxPeopleAtTable: Int!
     public var MaxPeopleCount: Int!
-    public var OpeningTime: String!
-    public var MainImage: UIImage!
+    public var FreeSpace: Int = 0
+    public var OpeningHours: OpeningHoursDto!
+    public var Latitude: Double!
+    public var Longitude: Double!
+    
+    public var MainImage: UIImageView!
     
     // MARK: Extension properties
-    public var RatingAvg: Double = 0.0
+    public var AvgRating: Double = 0.0
     public var GalleryImages = Array<GalleryImageDto>()
+    public var GalleryImageCount: Int = 0
     public var Ratings = Array<RatingDto>()
     {
         didSet
@@ -45,8 +50,7 @@ public class RestaurantDto : NSObject, MKAnnotation
         self.Address = address
         self.Name = name
         self.MaxPeopleAtTable = maxPeaopleAtTable
-        self.OpeningTime = openingTime
-        self.MainImage = UIImage(data: mainImage)
+        self.MainImage = UIImageView(image: UIImage(data: mainImage))
     }
     
     init?(json: [String: AnyObject])
@@ -58,7 +62,18 @@ public class RestaurantDto : NSObject, MKAnnotation
             let address = json["Address"] as? String,
             let maxPeopleAtTable = json["MaxPeopleAtTable"] as? Int,
             let maxPeopleCount = json["MaxPeopleCount"] as? Int,
-            let mainImage = UIImage(data: json["MainImageURL"] as! Data)
+            let freeSpace = json["FreeSpace"] as? Int,
+            let avgRating = json["AvgRating"] as? Double,
+            let galleryImageCount = json["GalleryImageCount"] as? Int,
+            let latitude = json["Latitude"] as? Double,
+            let longitude = json["Longitude"] as? Double,
+            let monday = json["Monday"] as? String,
+            let tuesday = json["Monday"] as? String,
+            let wednesday = json["Monday"] as? String,
+            let thursday = json["Monday"] as? String,
+            let friday = json["Monday"] as? String,
+            let saturday = json["Monday"] as? String,
+            let sunday = json["Monday"] as? String
         else
         {
                 return nil
@@ -69,8 +84,14 @@ public class RestaurantDto : NSObject, MKAnnotation
         self.Name = name
         self.MaxPeopleAtTable = maxPeopleAtTable
         self.MaxPeopleCount = maxPeopleCount
-        self.OpeningTime = nil
-        self.MainImage = mainImage
+        self.OpeningHours = OpeningHoursDto(
+            restaurantId: self.ID, monday: monday, tuesday: tuesday, wednesday: wednesday, thursday: thursday, friday: friday, saturday: saturday, sunday: sunday)
+        self.FreeSpace = freeSpace
+        self.AvgRating = avgRating
+        self.GalleryImageCount = galleryImageCount
+        self.Latitude = latitude
+        self.Longitude = longitude
+        self.MainImage = UIImageView()
         
         getGeoCoord()
     }
@@ -86,9 +107,15 @@ public class RestaurantDto : NSObject, MKAnnotation
                 if let location = placemark.location
                 {
                     self.coordinate = location.coordinate
+                    return
                 }
             }
         })
+        
+        if self.coordinate.latitude == 0.0 || self.coordinate.longitude == 0.0
+        {
+            self.coordinate = CLLocationCoordinate2D(latitude: self.Latitude, longitude: self.Longitude)
+        }
     }
     
     private func CalculateAvgRating()
@@ -100,7 +127,7 @@ public class RestaurantDto : NSObject, MKAnnotation
             values.append(r.Value)
         }
         
-        self.RatingAvg = values.average
+        self.AvgRating = values.average
     }
 }
 

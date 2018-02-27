@@ -21,20 +21,13 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     
     var mapViewFinishedLoading = false
     
-    let navBarVisualEffectView   = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
-    
     override func viewDidLoad()
     {
         super.viewDidLoad()
         
-        navBarVisualEffectView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.navigationController!.navigationBar.frame.maxY)
-        
-        self.navigationController?.navigationBar.isTranslucent = true
-        
-        self.view.addSubview(navBarVisualEffectView)
+        self.navigationItem.largeTitleDisplayMode = .never
         
         mapView.delegate = self
-        
         mapView.showsUserLocation = true
         mapView.addAnnotations(restaurants)
         
@@ -102,22 +95,23 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView)
     {
-        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(showOpenInMapAlert(_:)))
-        view.addGestureRecognizer(tapGestureRecognizer)
+//        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(showOpenInMapAlert(_:)))
+//        view.addGestureRecognizer(tapGestureRecognizer)
+        showOpenInMapAlert(view)
     }
     
-    @objc private func showOpenInMapAlert(_ sender: UITapGestureRecognizer)
+    @objc private func showOpenInMapAlert(_ view: MKAnnotationView)
     {
         let alertController = UIAlertController(title: "Navigáció", message: nil, preferredStyle: .actionSheet)
         
         alertController.addAction(UIAlertAction(title: "Maps", style: .default, handler: { (action) in
             
-            self.openInMaps(for: sender.view as! MKAnnotationView)
+            self.openInMaps(for: view)
         }))
         
         alertController.addAction(UIAlertAction(title: "Google Maps", style: .default, handler: { (action) in
             
-            self.openInGoogleMaps(for: sender.view as! MKAnnotationView)
+            self.openInGoogleMaps(for: view)
         }))
         
         alertController.addAction(UIAlertAction(title: "Mégsem", style: .cancel, handler: { (action) in

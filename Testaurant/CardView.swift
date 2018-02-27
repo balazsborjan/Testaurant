@@ -8,34 +8,36 @@
 
 import UIKit
 
-class CardView: UIView {
-
+class CardView: UIView
+{
     var shadowLayer: CAShapeLayer!
     
-    override func awakeFromNib() {
+    override func awakeFromNib()
+    {
         super.awakeFromNib()
         
         self.clipsToBounds = false
-        self.layer.cornerRadius = 10.0
+        self.layer.cornerRadius = 5.0
     }
     
-    override func layoutSubviews() {
+    override func layoutSubviews()
+    {
         super.layoutSubviews()
         
         if shadowLayer == nil {
             shadowLayer = CAShapeLayer()
             
-            let rect = CGRect(x: bounds.minX - 1, y: bounds.minY - 1, width: bounds.width + 2, height: bounds.height + 2)
+            let rect = CGRect(x: bounds.minX - 5, y: bounds.minY - 5, width: bounds.width + 6, height: bounds.height + 6)
             
-            shadowLayer.path = UIBezierPath(roundedRect: rect, cornerRadius: 10).cgPath
-            shadowLayer.fillColor = UIColor.white.cgColor
-            shadowLayer.shadowColor = UIColor.darkGray.cgColor
+            shadowLayer.path = UIBezierPath(roundedRect: rect, cornerRadius: 5).cgPath
+            shadowLayer.fillColor = UIColor.clear.cgColor
+            shadowLayer.shadowColor = UIColor.lightGray.cgColor
             shadowLayer.shadowPath = shadowLayer.path
             shadowLayer.shadowOffset = CGSize(width: 2.0, height: 2.0)
             shadowLayer.shadowOpacity = 0.5
             shadowLayer.shadowRadius = 2
             
-            layer.insertSublayer(shadowLayer, at: 0)
-        }        
+//            layer.insertSublayer(shadowLayer, at: 0)
+        }
     }
 }

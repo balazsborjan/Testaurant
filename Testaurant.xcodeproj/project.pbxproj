@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		050524012024B3FB00CD003A /* JTMaterialTransition.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 050524022024B3FB00CD003A /* JTMaterialTransition.framework */; };
+		05273EC0202ADF7C00D3F0C3 /* PreviewTransition.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 05273EC1202ADF7C00D3F0C3 /* PreviewTransition.framework */; };
 		052D36371ED73E420086B1D5 /* MoreInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052D36361ED73E420086B1D5 /* MoreInfoView.swift */; };
 		052D36391ED84E9F0086B1D5 /* MoreOptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052D36381ED84E9F0086B1D5 /* MoreOptionView.swift */; };
 		0548CCD51EE933BB00FE76B0 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0548CCD41EE933BB00FE76B0 /* MapKit.framework */; };
@@ -30,6 +32,10 @@
 		05A52BEC1EBB122C00DAF16A /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 05A52BE81EBB122C00DAF16A /* FBSDKLoginKit.framework */; };
 		05A52BEE1EBB19A900DAF16A /* MainPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A52BED1EBB19A900DAF16A /* MainPageViewController.swift */; };
 		05ABE7061EDB31F2003A9CCB /* MainPageTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05ABE7051EDB31F2003A9CCB /* MainPageTableViewCell.swift */; };
+		05B07E95203C7C9200C7F403 /* NVActivityIndicatorView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 05B07E96203C7C9200C7F403 /* NVActivityIndicatorView.framework */; };
+		05B07E97203C874100C7F403 /* UIImageColors.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 05B07E98203C874100C7F403 /* UIImageColors.framework */; };
+		05B07E9A203DED2C00C7F403 /* ProbaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B07E99203DED2C00C7F403 /* ProbaViewController.swift */; };
+		05B07E9C203DEE2A00C7F403 /* CreateReservationCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B07E9B203DEE2A00C7F403 /* CreateReservationCardView.swift */; };
 		05B489751ED96EB000F500AB /* OpenAppViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B489741ED96EB000F500AB /* OpenAppViewController.swift */; };
 		05B489771ED9741C00F500AB /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 05B489761ED9741C00F500AB /* Launch Screen.storyboard */; };
 		05C653D01EDEB16A00EDD1E3 /* RestaurantViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C653CF1EDEB16A00EDD1E3 /* RestaurantViewController.swift */; };
@@ -40,6 +46,13 @@
 		05CC6B421EF9058B00B1F54E /* FilterSwitchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CC6B411EF9058B00B1F54E /* FilterSwitchTableViewCell.swift */; };
 		05CC6B441EF9059B00B1F54E /* FilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CC6B431EF9059B00B1F54E /* FilterView.swift */; };
 		05CC6B461EF9156D00B1F54E /* FilterMultiTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CC6B451EF9156D00B1F54E /* FilterMultiTableViewCell.swift */; };
+		05CE47A220238A9800BCCD6F /* SideMenuManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05CE47A120238A9800BCCD6F /* SideMenuManager.swift */; };
+		05EFD3D020382E7A00F2FD28 /* CollapsableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05EFD3CF20382E7A00F2FD28 /* CollapsableHeaderView.swift */; };
+		05F5EFA4203221C50029EC4E /* CircleProgressBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F5EFA3203221C50029EC4E /* CircleProgressBarView.swift */; };
+		05F87FAD202DFAA200B54C56 /* SelectedRestaurantViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F87FAC202DFAA200B54C56 /* SelectedRestaurantViewController.swift */; };
+		05F87FAF202E112200B54C56 /* LeftSideMenuTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F87FAE202E112200B54C56 /* LeftSideMenuTableViewCell.swift */; };
+		05F87FB1202F122600B54C56 /* CreateReservationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F87FB0202F122600B54C56 /* CreateReservationTableViewCell.swift */; };
+		05F87FB320305DC800B54C56 /* ReservationKeyboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F87FB220305DC800B54C56 /* ReservationKeyboardView.swift */; };
 		95467A67FED53E1BDDD79F7D /* Pods_Testaurant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E04018B07AF0EEA0BD5FE0F /* Pods_Testaurant.framework */; };
 /* End PBXBuildFile section */
 
@@ -58,6 +71,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		050524022024B3FB00CD003A /* JTMaterialTransition.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = JTMaterialTransition.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		05273EC1202ADF7C00D3F0C3 /* PreviewTransition.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = PreviewTransition.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		052D36361ED73E420086B1D5 /* MoreInfoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoreInfoView.swift; sourceTree = "<group>"; };
 		052D36381ED84E9F0086B1D5 /* MoreOptionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoreOptionView.swift; sourceTree = "<group>"; };
 		0548CCD41EE933BB00FE76B0 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
@@ -81,6 +96,10 @@
 		05A52BE81EBB122C00DAF16A /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FBSDKLoginKit.framework; sourceTree = "<group>"; };
 		05A52BED1EBB19A900DAF16A /* MainPageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainPageViewController.swift; sourceTree = "<group>"; };
 		05ABE7051EDB31F2003A9CCB /* MainPageTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainPageTableViewCell.swift; sourceTree = "<group>"; };
+		05B07E96203C7C9200C7F403 /* NVActivityIndicatorView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = NVActivityIndicatorView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		05B07E98203C874100C7F403 /* UIImageColors.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = UIImageColors.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		05B07E99203DED2C00C7F403 /* ProbaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbaViewController.swift; sourceTree = "<group>"; };
+		05B07E9B203DEE2A00C7F403 /* CreateReservationCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateReservationCardView.swift; sourceTree = "<group>"; };
 		05B489741ED96EB000F500AB /* OpenAppViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenAppViewController.swift; sourceTree = "<group>"; };
 		05B489761ED9741C00F500AB /* Launch Screen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		05C653CF1EDEB16A00EDD1E3 /* RestaurantViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RestaurantViewController.swift; sourceTree = "<group>"; };
@@ -93,6 +112,13 @@
 		05CC6B411EF9058B00B1F54E /* FilterSwitchTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterSwitchTableViewCell.swift; sourceTree = "<group>"; };
 		05CC6B431EF9059B00B1F54E /* FilterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterView.swift; sourceTree = "<group>"; };
 		05CC6B451EF9156D00B1F54E /* FilterMultiTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterMultiTableViewCell.swift; sourceTree = "<group>"; };
+		05CE47A120238A9800BCCD6F /* SideMenuManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuManager.swift; sourceTree = "<group>"; };
+		05EFD3CF20382E7A00F2FD28 /* CollapsableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollapsableHeaderView.swift; sourceTree = "<group>"; };
+		05F5EFA3203221C50029EC4E /* CircleProgressBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleProgressBarView.swift; sourceTree = "<group>"; };
+		05F87FAC202DFAA200B54C56 /* SelectedRestaurantViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedRestaurantViewController.swift; sourceTree = "<group>"; };
+		05F87FAE202E112200B54C56 /* LeftSideMenuTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeftSideMenuTableViewCell.swift; sourceTree = "<group>"; };
+		05F87FB0202F122600B54C56 /* CreateReservationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateReservationTableViewCell.swift; sourceTree = "<group>"; };
+		05F87FB220305DC800B54C56 /* ReservationKeyboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReservationKeyboardView.swift; sourceTree = "<group>"; };
 		8E04018B07AF0EEA0BD5FE0F /* Pods_Testaurant.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Testaurant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		95099F78E8310F42062FB114 /* Pods-Testaurant.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testaurant.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Testaurant/Pods-Testaurant.debug.xcconfig"; sourceTree = "<group>"; };
 		E524BFEA2FD3E6998F8B97D2 /* Pods-Testaurant.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testaurant.release.xcconfig"; path = "Pods/Target Support Files/Pods-Testaurant/Pods-Testaurant.release.xcconfig"; sourceTree = "<group>"; };
@@ -103,6 +129,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05B07E97203C874100C7F403 /* UIImageColors.framework in Frameworks */,
+				05B07E95203C7C9200C7F403 /* NVActivityIndicatorView.framework in Frameworks */,
+				05273EC0202ADF7C00D3F0C3 /* PreviewTransition.framework in Frameworks */,
+				050524012024B3FB00CD003A /* JTMaterialTransition.framework in Frameworks */,
 				05787D16201C6E9200B98F54 /* TestaurantBL.framework in Frameworks */,
 				05A52BE91EBB122C00DAF16A /* Bolts.framework in Frameworks */,
 				05A52BEA1EBB122C00DAF16A /* FBSDKShareKit.framework in Frameworks */,
@@ -167,6 +197,10 @@
 		05A52BDC1EBB0E2500DAF16A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				05B07E98203C874100C7F403 /* UIImageColors.framework */,
+				05B07E96203C7C9200C7F403 /* NVActivityIndicatorView.framework */,
+				05273EC1202ADF7C00D3F0C3 /* PreviewTransition.framework */,
+				050524022024B3FB00CD003A /* JTMaterialTransition.framework */,
 				05787D17201C6E9200B98F54 /* TestaurantBL.framework */,
 				0548CCD41EE933BB00FE76B0 /* MapKit.framework */,
 				05A52BE51EBB122C00DAF16A /* Bolts.framework */,
@@ -187,6 +221,8 @@
 				05C653CF1EDEB16A00EDD1E3 /* RestaurantViewController.swift */,
 				0548CCD81EE9A66E00FE76B0 /* MapViewController.swift */,
 				058FDA2E1EED374900D0D710 /* ReservationsTableViewController.swift */,
+				05F87FAC202DFAA200B54C56 /* SelectedRestaurantViewController.swift */,
+				05B07E99203DED2C00C7F403 /* ProbaViewController.swift */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -200,6 +236,11 @@
 				0548CCD61EE936D700FE76B0 /* SelectedRestaurantView.swift */,
 				057E855B1EF7B47200D7A2B1 /* CardView.swift */,
 				05CC6B431EF9059B00B1F54E /* FilterView.swift */,
+				05CE47A120238A9800BCCD6F /* SideMenuManager.swift */,
+				05F87FB220305DC800B54C56 /* ReservationKeyboardView.swift */,
+				05F5EFA3203221C50029EC4E /* CircleProgressBarView.swift */,
+				05EFD3CF20382E7A00F2FD28 /* CollapsableHeaderView.swift */,
+				05B07E9B203DEE2A00C7F403 /* CreateReservationCardView.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -213,6 +254,8 @@
 				058FDA301EED456700D0D710 /* ReservationTableViewCell.swift */,
 				05CC6B411EF9058B00B1F54E /* FilterSwitchTableViewCell.swift */,
 				05CC6B451EF9156D00B1F54E /* FilterMultiTableViewCell.swift */,
+				05F87FAE202E112200B54C56 /* LeftSideMenuTableViewCell.swift */,
+				05F87FB0202F122600B54C56 /* CreateReservationTableViewCell.swift */,
 			);
 			name = Cells;
 			sourceTree = "<group>";
@@ -263,7 +306,7 @@
 					05A52BB81EBB0BF000DAF16A = {
 						CreatedOnToolsVersion = 8.3.2;
 						DevelopmentTeam = 7LF9VDB7F5;
-						LastSwiftMigration = 0830;
+						LastSwiftMigration = 0920;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.Maps.iOS = {
@@ -327,13 +370,16 @@
 			files = (
 			);
 			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Testaurant-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		F22A6BD485846A89F5D0411B /* [CP] Embed Pods Frameworks */ = {
@@ -342,9 +388,20 @@
 			files = (
 			);
 			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-Testaurant/Pods-Testaurant-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/JTMaterialTransition/JTMaterialTransition.framework",
+				"${BUILT_PRODUCTS_DIR}/NVActivityIndicatorView/NVActivityIndicatorView.framework",
+				"${BUILT_PRODUCTS_DIR}/PreviewTransition/PreviewTransition.framework",
+				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
+				"${BUILT_PRODUCTS_DIR}/UIImageColors/UIImageColors.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JTMaterialTransition.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/NVActivityIndicatorView.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PreviewTransition.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/UIImageColors.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -359,23 +416,32 @@
 			buildActionMask = 2147483647;
 			files = (
 				05B489751ED96EB000F500AB /* OpenAppViewController.swift in Sources */,
+				05F5EFA4203221C50029EC4E /* CircleProgressBarView.swift in Sources */,
 				058FDA2F1EED374900D0D710 /* ReservationsTableViewController.swift in Sources */,
 				052D36371ED73E420086B1D5 /* MoreInfoView.swift in Sources */,
+				05B07E9A203DED2C00C7F403 /* ProbaViewController.swift in Sources */,
 				058FDA311EED456700D0D710 /* ReservationTableViewCell.swift in Sources */,
 				05C653E01EE1E5E800EDD1E3 /* NetworkDelegate.swift in Sources */,
+				05CE47A220238A9800BCCD6F /* SideMenuManager.swift in Sources */,
+				05F87FAD202DFAA200B54C56 /* SelectedRestaurantViewController.swift in Sources */,
 				0548CCD71EE936D700FE76B0 /* SelectedRestaurantView.swift in Sources */,
 				05A52BEE1EBB19A900DAF16A /* MainPageViewController.swift in Sources */,
 				05CC6B441EF9059B00B1F54E /* FilterView.swift in Sources */,
 				05A52BBF1EBB0BF000DAF16A /* LoginViewController.swift in Sources */,
+				05F87FB1202F122600B54C56 /* CreateReservationTableViewCell.swift in Sources */,
 				0548CCD91EE9A66E00FE76B0 /* MapViewController.swift in Sources */,
 				052D36391ED84E9F0086B1D5 /* MoreOptionView.swift in Sources */,
 				05ABE7061EDB31F2003A9CCB /* MainPageTableViewCell.swift in Sources */,
 				05C653D21EDECA6000EDD1E3 /* GaleryCollectionViewCell.swift in Sources */,
 				05C653D61EDECB6000EDD1E3 /* ReservationView.swift in Sources */,
+				05B07E9C203DEE2A00C7F403 /* CreateReservationCardView.swift in Sources */,
 				05A52BBD1EBB0BF000DAF16A /* AppDelegate.swift in Sources */,
 				057E855C1EF7B47200D7A2B1 /* CardView.swift in Sources */,
+				05F87FAF202E112200B54C56 /* LeftSideMenuTableViewCell.swift in Sources */,
 				05C653D01EDEB16A00EDD1E3 /* RestaurantViewController.swift in Sources */,
 				05CC6B421EF9058B00B1F54E /* FilterSwitchTableViewCell.swift in Sources */,
+				05F87FB320305DC800B54C56 /* ReservationKeyboardView.swift in Sources */,
+				05EFD3D020382E7A00F2FD28 /* CollapsableHeaderView.swift in Sources */,
 				05CC6B461EF9156D00B1F54E /* FilterMultiTableViewCell.swift in Sources */,
 				05C653D41EDECA7700EDD1E3 /* RatingTableViewCell.swift in Sources */,
 				05A52BC51EBB0BF000DAF16A /* Testaurant.xcdatamodeld in Sources */,
@@ -451,7 +517,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -502,7 +568,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -528,7 +594,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Testaurant/Testaurant-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = On;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -549,7 +616,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = hu.kacsak.Testaurant;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Testaurant/Testaurant-Bridging-Header.h";
-				SWIFT_VERSION = 3.0;
+				SWIFT_SWIFT3_OBJC_INFERENCE = On;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
